@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">DranACG</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_header_title">漫画</string>
+    <string name="book_source">书源</string>
+    <string name="book_shelf">书架</string>
+    <string name="download">下载</string>
+    <string name="others">其他</string>
+    <string name="about">关于</string>
+    <string name="comic">漫画</string>
+    <string name="none_favourite">没有收藏</string>
+</resources>
