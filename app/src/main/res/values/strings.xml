@@ -11,4 +11,8 @@
     <string name="about">关于</string>
     <string name="comic">漫画</string>
     <string name="none_favourite">没有收藏</string>
+    <string name="search">搜索</string>
+    <string name="comic_icon">漫画图片</string>
+    <string name="non_search_result">没有结果</string>
+    <string name="loading">加载中</string>
 </resources>
