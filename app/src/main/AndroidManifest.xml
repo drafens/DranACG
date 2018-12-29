@@ -30,9 +30,12 @@
         <activity
             android:name=".ui.activity.SearchActivity"
             android:label="@string/search" />
-
-        <activity android:name=".error.ErrorActivity"
-            android:label="@string/error"/>
+        <activity
+            android:name=".error.ErrorActivity"
+            android:label="@string/error" />
+        <activity
+            android:name=".ui.activity.EpisodeActivity"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

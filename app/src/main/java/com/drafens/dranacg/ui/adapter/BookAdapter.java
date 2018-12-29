@@ -1,6 +1,7 @@
 package com.drafens.dranacg.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.tools.ImageManager;
 import com.drafens.dranacg.R;
+import com.drafens.dranacg.ui.activity.EpisodeActivity;
 
 import java.util.List;
 
@@ -35,11 +37,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 Book book = bookList.get(position);
-                /*Intent intent = new Intent(context,EpisodeResult.class);
+                Intent intent = new Intent(context,EpisodeActivity.class);
                 intent.putExtra("book",book);
-                intent.putExtra("search_item",searchItem);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);*/
+                context.startActivity(intent);
             }
         });
         return holder;

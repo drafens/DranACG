@@ -86,10 +86,18 @@ public class SearchActivity extends AppCompatActivity {
                 }catch (MyNetworkException e){
                     intent = new Intent(SearchActivity.this, ErrorActivity.class);
                     intent.putExtra("error_code", ErrorActivity.MyNetworkException);
+                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            reminderLoading.setVisibility(View.GONE);
+                            reminderNonResult.setVisibility(View.GONE);
+                            button.setClickable(true);
+                        }
+                    });
                 }catch (MyJsoupResolveException e){
                     intent = new Intent(SearchActivity.this, ErrorActivity.class);
                     intent.putExtra("error_code", ErrorActivity.MyJsoupResolveException);
-                }finally {
                     startActivity(intent);
                     runOnUiThread(new Runnable() {
                         @Override
