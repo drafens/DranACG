@@ -18,13 +18,12 @@
             android:fitsSystemWindows="true"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:layout_collapseMode="parallax"/>
+            app:layout_scrollFlags="scroll|snap"/>
 
         <android.support.design.widget.TextInputEditText
-            android:layout_marginTop="?attr/actionBarSize"
             android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,9 +33,40 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            app:layout_collapseMode="pin"/>
+            android:layout_marginEnd="15dp"/>
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:id="@+id/reminder_loading"
+                android:text="@string/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:id="@+id/reminder_non_result"
+                android:text="@string/non_search_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_search"
@@ -46,31 +76,4 @@
         android:layout_margin="@dimen/fab_margin"
         android:background="?attr/colorPrimary"
         android:src="@drawable/ic_search_white_24dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:id="@+id/reminder_loading"
-            android:text="@string/loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:visibility="gone"
-            android:layout_gravity="center"
-            android:id="@+id/reminder_non_result"
-            android:text="@string/non_search_result"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
-
 </android.support.design.widget.CoordinatorLayout>
