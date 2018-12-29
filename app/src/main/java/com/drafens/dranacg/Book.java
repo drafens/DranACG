@@ -23,94 +23,94 @@ public class Book implements Serializable {
     private String readPosition="";
     private String readMode="";
 
-    Book(String website,String id){
+    public Book(String website, String id){
         this.website = website;
         this.id=id;
     }
 
-    String getId() {
+    public String getId() {
         return id;
     }
-    String getWebsite() {
+    public String getWebsite() {
         return website;
     }
-    String getName() {
+    public String getName() {
         return name;
     }
-    String getAuthor() {
+    public String getAuthor() {
         return author;
     }
-    String getIcon() {
+    public String getIcon() {
         return icon;
     }
-    String getType() {
+    public String getType() {
         return type;
     }
-    String getUpdateChapter() {
+    public String getUpdateChapter() {
         return updateChapter;
     }
-    String getUpdateChapter_id() {
+    public String getUpdateChapter_id() {
         return updateChapter_id;
     }
-    String getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
-    String getLastReadChapter() {
+    public String getLastReadChapter() {
         return lastReadChapter;
     }
-    String getLastReadChapter_id() {
+    public String getLastReadChapter_id() {
         return lastReadChapter_id;
     }
-    String getLastReadTime() {
+    public String getLastReadTime() {
         return lastReadTime;
     }
-    String getBriefInfo() {
+    public String getBriefInfo() {
         return briefInfo;
     }
-    String getReadPosition() {
+    public String getReadPosition() {
         return readPosition;
     }
-    String getReadMode() {
+    public String getReadMode() {
         return readMode;
     }
 
-    void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
-    void setAuthor(String author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
-    void setIcon(String icon) {
+    public void setIcon(String icon) {
         this.icon = icon;
     }
-    void setType(String type) {
+    public void setType(String type) {
         this.type = type;
     }
-    void setUpdateChapter(String updateChapter) {
+    public void setUpdateChapter(String updateChapter) {
         this.updateChapter = updateChapter;
     }
-    void setUpdateChapter_id(String updateChapter_id) {
+    public void setUpdateChapter_id(String updateChapter_id) {
         this.updateChapter_id = updateChapter_id;
     }
-    void setUpdateTime(String updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
-    void setLastReadChapter(String lastReadChapter) {
+    public void setLastReadChapter(String lastReadChapter) {
         this.lastReadChapter = lastReadChapter;
     }
-    void setLastReadChapter_id(String lastReadChapter_id) {
+    public void setLastReadChapter_id(String lastReadChapter_id) {
         this.lastReadChapter_id = lastReadChapter_id;
     }
-    void setLastReadTime(String lastReadTime) {
+    public void setLastReadTime(String lastReadTime) {
         this.lastReadTime = lastReadTime;
     }
-    void setBriefInfo(String briefInfo) {
+    public void setBriefInfo(String briefInfo) {
         this.briefInfo = briefInfo;
     }
-    void setReadMode(String readMode) {
+    public void setReadMode(String readMode) {
         this.readMode = readMode;
     }
-    void setReadPosition(String readPosition) {
+    public void setReadPosition(String readPosition) {
         this.readPosition = readPosition;
     }
 

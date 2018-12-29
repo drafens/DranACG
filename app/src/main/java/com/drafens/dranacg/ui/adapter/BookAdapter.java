@@ -1,4 +1,4 @@
-package com.drafens.dranacg;
+package com.drafens.dranacg.ui.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.drafens.dranacg.Book;
+import com.drafens.dranacg.tools.ImageManager;
+import com.drafens.dranacg.R;
+
 import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
@@ -16,7 +20,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
     private static final int TYPE_ITEM = 1;
     private List<Book> bookList;
     private Context context;
-    BookAdapter(Context context, List<Book> bookList){
+    public BookAdapter(Context context, List<Book> bookList){
         this.bookList = bookList;
         this.context = context;
     }

@@ -1,8 +1,8 @@
-package com.drafens.dranacg;
+package com.drafens.dranacg.ui.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -18,24 +17,41 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.drafens.dranacg.Book;
+import com.drafens.dranacg.R;
+import com.drafens.dranacg.Sites;
+import com.drafens.dranacg.error.ErrorActivity;
+import com.drafens.dranacg.error.MyJsoupResolveException;
+import com.drafens.dranacg.error.MyNetworkException;
+import com.drafens.dranacg.ui.adapter.BookAdapter;
+
 import java.util.List;
 import java.util.Objects;
 
-public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
+public class SearchActivity extends AppCompatActivity {
     private String TAG = "SearchActivity";
     private RecyclerView recyclerView;
     private EditText editText;
     private FloatingActionButton button;
     private TextView reminderLoading;
     private TextView reminderNonResult;
-    private String siteItem=Sites.GUFENG;
+    private String siteItem = Sites.GUFENG;
     private String searchContent;
     private List<Book> bookList;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            String s = bundle.getString("site_item");
+            if (s != null) {
+                siteItem = s;
+            }
+        }
         initView();
     }
 
@@ -67,10 +83,23 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     }else {
                         Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
+                }catch (MyNetworkException e){
+                    intent = new Intent(SearchActivity.this, ErrorActivity.class);
+                    intent.putExtra("error_code", ErrorActivity.MyNetworkException);
+                }catch (MyJsoupResolveException e){
+                    intent = new Intent(SearchActivity.this, ErrorActivity.class);
+                    intent.putExtra("error_code", ErrorActivity.MyJsoupResolveException);
+                }finally {
+                    startActivity(intent);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            reminderLoading.setVisibility(View.GONE);
+                            reminderNonResult.setVisibility(View.GONE);
+                            button.setClickable(true);
+                        }
+                    });
                 }
-
             }
         }).start();
     }
@@ -88,13 +117,15 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayout.VERTICAL);
         recyclerView.setLayoutManager(manager);
-        button.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_search:
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 searchContent = editText.getText().toString();
                 if (searchContent.length()>0) {
                     getSearchResult();
@@ -104,17 +135,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 }else {
                     Toast.makeText(SearchActivity.this,"请输入搜索内容",Toast.LENGTH_SHORT).show();
                 }
-                break;
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+            }
+        });
     }
 }

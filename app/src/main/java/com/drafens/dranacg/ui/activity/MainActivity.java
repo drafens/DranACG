@@ -1,4 +1,4 @@
-package com.drafens.dranacg;
+package com.drafens.dranacg.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +15,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
+import com.drafens.dranacg.ui.fragment.FragmentAbout;
+import com.drafens.dranacg.ui.fragment.FragmentBookShelf;
+import com.drafens.dranacg.ui.fragment.FragmentBookSource;
+import com.drafens.dranacg.ui.fragment.FragmentDownload;
+import com.drafens.dranacg.R;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener, FragmentBookSource.CallBackValue {
     private static final String TAG = "MainActivity";
     private Toolbar toolbar;
     private Fragment fragment=new FragmentBookShelf();
-    private int preId = R.id.nav_book_shelf;
+    private int preNavId = R.id.nav_book_shelf;
+    private String siteItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_about) {
             fragment = new FragmentAbout();
         }
-        if (preId != id) {
-            preId = id;
+        if (preNavId != id) {
+            preNavId = id;
             Log.d(TAG, "onNavigationItemSelected: ");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_main, fragment);
@@ -96,9 +103,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()){
             case R.id.action_search:
                 Intent intent = new Intent(this,SearchActivity.class);
+                intent.putExtra("site_item", siteItem);
                 startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void sendMessage(String str) {
+        siteItem = str;
     }
 }

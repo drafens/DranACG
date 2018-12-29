@@ -8,7 +8,7 @@ public class Episode implements Serializable {
     private String name;
     private String id;
 
-    Episode(String name, String id){
+    public Episode(String name, String id){
         this.name=name;
         this.id=id;
     }

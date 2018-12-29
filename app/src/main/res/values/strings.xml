@@ -15,4 +15,6 @@
     <string name="comic_icon">漫画图片</string>
     <string name="non_search_result">没有结果</string>
     <string name="loading">加载中</string>
+    <string name="retry_connect">重试</string>
+    <string name="error">错误</string>
 </resources>
