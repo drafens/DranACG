@@ -12,6 +12,8 @@ import android.widget.TextView;
 import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
+    private static final int TYPE_HEADER = 2;
+    private static final int TYPE_ITEM = 1;
     private List<Book> bookList;
     private Context context;
     BookAdapter(Context context, List<Book> bookList){
@@ -50,11 +52,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
         ImageManager.getIcon(context,book.getIcon(),holder.icon);
     }
 
-    @Override
-    public int getItemCount() {
-        return bookList.size();
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder{
         View bookView;
         TextView name;
@@ -74,5 +71,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
             type = view.findViewById(R.id.tv_type);
             updateTime = view.findViewById(R.id.tv_update_time);
         }
+    }
+
+    @Override
+    public int getItemCount() {
+        return bookList == null ? 0 : bookList.size();
     }
 }
