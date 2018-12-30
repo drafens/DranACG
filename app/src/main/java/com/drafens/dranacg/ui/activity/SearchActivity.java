@@ -56,59 +56,6 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
         initView();
     }
 
-    private void getSearchResult() {
-        reminderLoading.setVisibility(View.VISIBLE);
-        reminderNonResult.setVisibility(View.GONE);
-        button.setClickable(false);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Sites sites = Sites.getSites(siteItem);
-                try {
-                    if (sites != null) {
-                        bookList = sites.getSearch(searchContent);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                reminderLoading.setVisibility(View.GONE);
-                                if (bookList.size()<=0){
-                                    reminderNonResult.setVisibility(View.VISIBLE);
-                                }
-                                button.setClickable(true);
-                                BookAdapter adapter = new BookAdapter(SearchActivity.this, bookList);
-                                recyclerView.setAdapter(adapter);
-                                recyclerView.addItemDecoration(new DividerItemDecoration(SearchActivity.this, DividerItemDecoration.VERTICAL));
-                                Log.d(TAG, "run: ");
-                            }
-                        });
-                    }else {
-                        Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
-                    }
-                }catch (MyNetworkException e){
-                    ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyNetworkException);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            reminderLoading.setVisibility(View.GONE);
-                            reminderNonResult.setVisibility(View.GONE);
-                            button.setClickable(true);
-                        }
-                    });
-                }catch (MyJsoupResolveException e){
-                    ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyJsoupResolveException);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            reminderLoading.setVisibility(View.GONE);
-                            reminderNonResult.setVisibility(View.GONE);
-                            button.setClickable(true);
-                        }
-                    });
-                }
-            }
-        }).start();
-    }
-
     private void initView() {
         recyclerView = findViewById(R.id.recycler);
         editText = findViewById(R.id.et_search);
@@ -132,15 +79,7 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchContent = editText.getText().toString();
-                if (!searchContent.isEmpty()) {
-                    getSearchResult();
-                    //收起输入法
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-                }else {
-                    Toast.makeText(SearchActivity.this,"请输入搜索内容",Toast.LENGTH_SHORT).show();
-                }
+                getSearchResult();
             }
         });
     }
@@ -148,16 +87,69 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId==EditorInfo.IME_ACTION_SEARCH){
-            searchContent = editText.getText().toString();
-            if (!searchContent.isEmpty()) {
-                getSearchResult();
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-                return true;
-            }else {
-                Toast.makeText(SearchActivity.this,"请输入搜索内容",Toast.LENGTH_SHORT).show();
-            }
+            getSearchResult();
         }
         return false;
+    }
+
+    private void getSearchResult() {
+        searchContent = editText.getText().toString();
+        if (!searchContent.isEmpty()) {
+            reminderLoading.setVisibility(View.VISIBLE);
+            reminderNonResult.setVisibility(View.GONE);
+            button.setClickable(false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Sites sites = Sites.getSites(siteItem);
+                    try {
+                        if (sites != null) {
+                            bookList = sites.getSearch(searchContent);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reminderLoading.setVisibility(View.GONE);
+                                    if (bookList.size()<=0){
+                                        reminderNonResult.setVisibility(View.VISIBLE);
+                                    }
+                                    button.setClickable(true);
+                                    BookAdapter adapter = new BookAdapter(SearchActivity.this, bookList);
+                                    recyclerView.setAdapter(adapter);
+                                    recyclerView.addItemDecoration(new DividerItemDecoration(SearchActivity.this, DividerItemDecoration.VERTICAL));
+                                    Log.d(TAG, "run: ");
+                                }
+                            });
+                        }else {
+                            Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (MyNetworkException e){
+                        ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyNetworkException);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                reminderLoading.setVisibility(View.GONE);
+                                reminderNonResult.setVisibility(View.GONE);
+                                button.setClickable(true);
+                            }
+                        });
+                    }catch (MyJsoupResolveException e){
+                        ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyJsoupResolveException);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                reminderLoading.setVisibility(View.GONE);
+                                reminderNonResult.setVisibility(View.GONE);
+                                button.setClickable(true);
+                            }
+                        });
+                    }
+                }
+            }).start();
+            //收起输入法
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        }else {
+            Toast.makeText(SearchActivity.this,"请输入搜索内容",Toast.LENGTH_SHORT).show();
+        }
     }
 }
