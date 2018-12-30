@@ -58,11 +58,11 @@ public class Gufeng extends Sites {
     }
 
     @Override
-    public Book getBook(Book book, String lastReadChapter, String lastReadChapter_id, String lastReadTime){
-        book.setLastReadChapter(lastReadChapter);
-        book.setLastReadChapter_id(lastReadChapter_id);
-        book.setLastReadTime(lastReadTime);
+    public Book getBook(Book book){
         Log.d(TAG, "getBook: ");
+        //book.setUpdateChapter(updateChapter);
+        //book.setUpdateChapter_id(updateChapter_id);
+        //book.setUpdateTime(updateTime);
         return book;
     }
 

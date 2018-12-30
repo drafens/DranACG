@@ -62,7 +62,7 @@ public class Pufei extends Sites {
     }
 
     @Override
-    public Book getBook(Book book,String lastReadChapter,String lastReadChapter_id,String lastReadTime) throws MyJsoupResolveException {
+    public Book getBook(Book book) throws MyJsoupResolveException {
         try {
             String url = url_pufei + book.getId();
             Document document = Jsoup.connect(url).get();
@@ -71,11 +71,10 @@ public class Pufei extends Sites {
             Element element = document.select("div[class=chapter]").select("li").get(0);
             String updateChapter_id = element.select("a").attr("href");
             updateChapter_id = updateChapter_id.substring(0,updateChapter_id.indexOf(".html"));
-            book.setLastReadChapter(lastReadChapter);
-            book.setLastReadChapter_id(lastReadChapter_id);
-            book.setLastReadTime(lastReadTime);
             book.setBriefInfo(briefInfo);
             book.setUpdateChapter_id(updateChapter_id);
+            //book.setUpdateChapter(updateChapter);
+            //book.setUpdateTime(updateTime);
         }catch(Exception e){
             e.printStackTrace();
             throw new MyJsoupResolveException();

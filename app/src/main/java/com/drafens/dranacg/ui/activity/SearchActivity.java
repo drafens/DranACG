@@ -25,7 +25,7 @@ import com.drafens.dranacg.Sites;
 import com.drafens.dranacg.error.ErrorActivity;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.error.MyNetworkException;
-import com.drafens.dranacg.ui.adapter.BookAdapter;
+import com.drafens.dranacg.ui.adapter.SearchResultAdapter;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
     private FloatingActionButton button;
     private TextView reminderLoading;
     private TextView reminderNonResult;
-    private String siteItem = Sites.GUFENG;
+    private String siteItem = Sites.COMIC_GROUP[0];
     private String searchContent;
     private List<Book> bookList;
 
@@ -113,7 +113,7 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
                                         reminderNonResult.setVisibility(View.VISIBLE);
                                     }
                                     button.setClickable(true);
-                                    BookAdapter adapter = new BookAdapter(SearchActivity.this, bookList);
+                                    SearchResultAdapter adapter = new SearchResultAdapter(SearchActivity.this, bookList);
                                     recyclerView.setAdapter(adapter);
                                     recyclerView.addItemDecoration(new DividerItemDecoration(SearchActivity.this, DividerItemDecoration.VERTICAL));
                                     Log.d(TAG, "run: ");

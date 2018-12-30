@@ -17,9 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.drafens.dranacg.Book;
-import com.drafens.dranacg.error.MyFileWriteException;
-import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.ui.fragment.FragmentAbout;
 import com.drafens.dranacg.ui.fragment.FragmentBookShelf;
 import com.drafens.dranacg.ui.fragment.FragmentBookSource;

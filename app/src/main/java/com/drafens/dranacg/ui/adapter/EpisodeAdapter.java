@@ -16,6 +16,9 @@ import android.widget.TextView;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
+import com.drafens.dranacg.ui.activity.ComicImageHorizon;
+import com.drafens.dranacg.ui.activity.ComicImageVertical;
+import com.drafens.dranacg.ui.activity.MainActivity;
 
 import java.util.List;
 
@@ -42,30 +45,27 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         holder.episodeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //int position = holder.getAdapterPosition();
-                /*Intent intent;
+                Intent intent;
                 switch (searchItem){
                     case Book.COMIC:
-                        SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                        intent = new Intent(context, ComicImageHorizon.class);
+                        break;
+                        /*SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                         String read_patterns = pref.getString("read_patterns","");
                         if(read_patterns.equals("vertical")) {
                             intent = new Intent(context, ComicImageVertical.class);
                         }else {
                             intent = new Intent(context, ComicImageHorizon.class);
                         }
-                        break;
-                    case Book.ANIMATION:
+                        break;*/
+                    /*case Book.ANIMATION:
                         intent = new Intent(context,AnimationVideo.class);
-                        break;
+                        break;*/
                     default:
                         intent = new Intent(context,MainActivity.class);
                         break;
                 }
-                intent.putExtra("position", position);
-                intent.putExtra("episode",(Serializable) episodeList);
-                intent.putExtra("book",book);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);*/
+                context.startActivity(intent);
             }
         });
         return holder;

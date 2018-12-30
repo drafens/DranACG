@@ -14,7 +14,7 @@ public abstract class Sites {
     public static final String PUFEI = "www.pufei.net";
     public static final String GUFENG = "m.gufengmh.com";
     public static final String ANIMATION_GROUP[] = {Sites.KIRIKIRI};
-    public static final String COMIC_GROUP[] = {Sites.CHUIXUE,Sites.PUFEI,Sites.GUFENG};
+    public static final String COMIC_GROUP[] = {Sites.GUFENG,Sites.CHUIXUE,Sites.PUFEI};
 
     /**
      *
@@ -26,13 +26,11 @@ public abstract class Sites {
 
     /**
      *
-     * @param lastReadChapter 非收藏接收""
-     * @param lastReadChapter_id 非收藏接收""
-     * @param lastReadTime 非收藏接收""
      * @return Book格式的对象
      * 解析失败返回null
+     * 获取最新的更新章节 及 其他补充信息
      */
-    public abstract Book getBook(Book book,String lastReadChapter,String lastReadChapter_id,String lastReadTime)throws MyJsoupResolveException;
+    public abstract Book getBook(Book book)throws MyJsoupResolveException;
 
     /**
      *

@@ -17,12 +17,12 @@ import com.drafens.dranacg.ui.activity.EpisodeActivity;
 
 import java.util.List;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
+public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder>{
     private static final int TYPE_HEADER = 2;
     private static final int TYPE_ITEM = 1;
     private List<Book> bookList;
     private Context context;
-    public BookAdapter(Context context, List<Book> bookList){
+    public SearchResultAdapter(Context context, List<Book> bookList){
         this.bookList = bookList;
         this.context = context;
     }
@@ -30,7 +30,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder>{
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_book, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_serch_result, parent, false);
         final ViewHolder holder = new ViewHolder(view);
         holder.bookView.setOnClickListener(new View.OnClickListener() {
             @Override

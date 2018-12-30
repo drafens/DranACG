@@ -21,7 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class Chuixue extends Sites {
-    private static String url_chuixue = "https://m.chuixue.net";
+    private String TAG = "Chuixue";
+    private static String url_chuixue = "http://m.chuixue.net";
 
     @Override
     public List<Book> getSearch(String search_id) throws MyNetworkException,MyJsoupResolveException {
@@ -30,6 +31,7 @@ public class Chuixue extends Sites {
         try {
             search_id = URLEncoder.encode(search_id, "gb2312");
             String url = url_chuixue + "/e/search/?searchget=1&tbname=movie&tempid=1&show=title,keyboard&keyboard=" + search_id;
+            Log.d("TAG", url);
             document = Jsoup.connect(url).header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
                     .header("referer", "m.chuixue.net")
                     .header("Accept-Language", "zh-CN,zh;q=0.8")
@@ -60,7 +62,7 @@ public class Chuixue extends Sites {
     }
 
     @Override
-    public Book getBook(Book book,String lastReadChapter,String lastReadChapter_id,String lastReadTime) throws MyJsoupResolveException{
+    public Book getBook(Book book) throws MyJsoupResolveException{
         try {
             String url = url_chuixue + book.getId().replace("mh","manhua");
             Document document = Jsoup.connect(url).get();
@@ -68,11 +70,10 @@ public class Chuixue extends Sites {
             String updateChapter_id=elements.select("dd").get(4).select("a").attr("href");
             updateChapter_id=updateChapter_id.substring(0,updateChapter_id.indexOf(".html")).replace("http://www.chuixue.net/","/");
             String briefInfo=elements.select("div[id=bookIntro]").text();
-            book.setLastReadChapter(lastReadChapter);
-            book.setLastReadChapter_id(lastReadChapter_id);
-            book.setLastReadTime(lastReadTime);
             book.setBriefInfo(briefInfo);
             book.setUpdateChapter_id(updateChapter_id);
+            //book.setUpdateChapter(updateChapter);
+            //book.setUpdateTime(updateTime);
         }catch(Exception e){
             e.printStackTrace();
             throw new MyJsoupResolveException();
