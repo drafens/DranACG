@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +21,8 @@ import com.drafens.dranacg.ui.activity.ComicImageHorizon;
 import com.drafens.dranacg.ui.activity.ComicImageVertical;
 import com.drafens.dranacg.ui.activity.MainActivity;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder>{
@@ -27,14 +30,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private Book book;
     private Context context;
     private int searchItem;
-    private int position;
+    private int recentPosition;
 
-    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int position){
+    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int recentPposition){
         this.episodeList = episodeList;
         this.book = book;
         this.context = context;
         this.searchItem = searchItem;
-        this.position = position;
+        this.recentPosition = recentPposition;
     }
 
     @NonNull
@@ -49,6 +52,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                 switch (searchItem){
                     case Book.COMIC:
                         intent = new Intent(context, ComicImageHorizon.class);
+                        intent.putExtra("episode",(Serializable) episodeList);
+                        intent.putExtra("book",book);
                         break;
                         /*SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                         String read_patterns = pref.getString("read_patterns","");
@@ -77,7 +82,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         String displayString = " "+ (position+1) + "  " + episode.getName();
         String displayString_recent = " *"+ (position+1) + "  " + episode.getName();
         //holder.name.setText(displayString);
-        if (this.position == position){
+        if (recentPosition == position){
             holder.name.setText(displayString_recent);
         }else {
             holder.name.setText(displayString);
