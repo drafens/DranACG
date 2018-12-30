@@ -1,6 +1,7 @@
 package com.drafens.dranacg.comic;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
@@ -30,7 +31,7 @@ public class Chuixue extends Sites {
             search_id = URLEncoder.encode(search_id, "gb2312");
             String url = url_chuixue + "/e/search/?searchget=1&tbname=movie&tempid=1&show=title,keyboard&keyboard=" + search_id;
             document = Jsoup.connect(url).header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-                    .header("referer", "m.chuixue.com")
+                    .header("referer", "m.chuixue.net")
                     .header("Accept-Language", "zh-CN,zh;q=0.8")
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")
                     .get();

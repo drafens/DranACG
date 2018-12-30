@@ -10,7 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,7 +30,7 @@ import com.drafens.dranacg.ui.adapter.BookAdapter;
 import java.util.List;
 import java.util.Objects;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements TextView.OnEditorActionListener{
     private String TAG = "SearchActivity";
     private RecyclerView recyclerView;
     private EditText editText;
@@ -38,7 +40,6 @@ public class SearchActivity extends AppCompatActivity {
     private String siteItem = Sites.GUFENG;
     private String searchContent;
     private List<Book> bookList;
-    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,9 +85,7 @@ public class SearchActivity extends AppCompatActivity {
                         Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
                     }
                 }catch (MyNetworkException e){
-                    intent = new Intent(SearchActivity.this, ErrorActivity.class);
-                    intent.putExtra("error_code", ErrorActivity.MyNetworkException);
-                    startActivity(intent);
+                    ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyNetworkException);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -96,9 +95,7 @@ public class SearchActivity extends AppCompatActivity {
                         }
                     });
                 }catch (MyJsoupResolveException e){
-                    intent = new Intent(SearchActivity.this, ErrorActivity.class);
-                    intent.putExtra("error_code", ErrorActivity.MyJsoupResolveException);
-                    startActivity(intent);
+                    ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyJsoupResolveException);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -131,11 +128,12 @@ public class SearchActivity extends AppCompatActivity {
                 finish();
             }
         });
+        editText.setOnEditorActionListener(this);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchContent = editText.getText().toString();
-                if (searchContent.length()>0) {
+                if (!searchContent.isEmpty()) {
                     getSearchResult();
                     //收起输入法
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -145,5 +143,21 @@ public class SearchActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId==EditorInfo.IME_ACTION_SEARCH){
+            searchContent = editText.getText().toString();
+            if (!searchContent.isEmpty()) {
+                getSearchResult();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+                return true;
+            }else {
+                Toast.makeText(SearchActivity.this,"请输入搜索内容",Toast.LENGTH_SHORT).show();
+            }
+        }
+        return false;
     }
 }

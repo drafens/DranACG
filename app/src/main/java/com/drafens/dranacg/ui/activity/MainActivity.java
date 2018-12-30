@@ -1,9 +1,11 @@
 package com.drafens.dranacg.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +17,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.drafens.dranacg.Book;
+import com.drafens.dranacg.error.MyFileWriteException;
+import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.ui.fragment.FragmentAbout;
 import com.drafens.dranacg.ui.fragment.FragmentBookShelf;
 import com.drafens.dranacg.ui.fragment.FragmentBookSource;
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
     }
 
     private void initView() {

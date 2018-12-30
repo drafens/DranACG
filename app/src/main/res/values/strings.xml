@@ -18,4 +18,5 @@
     <string name="retry_connect">重试</string>
     <string name="error">错误</string>
     <string name="action_settings">设置</string>
+    <string name="non_episode_result">没有章节</string>
 </resources>

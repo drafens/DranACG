@@ -1,0 +1,102 @@
+package com.drafens.dranacg.ui.adapter;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.drafens.dranacg.Book;
+import com.drafens.dranacg.Episode;
+import com.drafens.dranacg.R;
+
+import java.util.List;
+
+public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder>{
+    private List<Episode> episodeList;
+    private Book book;
+    private Context context;
+    private int searchItem;
+    private int position;
+
+    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int position){
+        this.episodeList = episodeList;
+        this.book = book;
+        this.context = context;
+        this.searchItem = searchItem;
+        this.position = position;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_episode, parent, false);
+        final ViewHolder holder = new ViewHolder(view);
+        holder.episodeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //int position = holder.getAdapterPosition();
+                /*Intent intent;
+                switch (searchItem){
+                    case Book.COMIC:
+                        SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                        String read_patterns = pref.getString("read_patterns","");
+                        if(read_patterns.equals("vertical")) {
+                            intent = new Intent(context, ComicImageVertical.class);
+                        }else {
+                            intent = new Intent(context, ComicImageHorizon.class);
+                        }
+                        break;
+                    case Book.ANIMATION:
+                        intent = new Intent(context,AnimationVideo.class);
+                        break;
+                    default:
+                        intent = new Intent(context,MainActivity.class);
+                        break;
+                }
+                intent.putExtra("position", position);
+                intent.putExtra("episode",(Serializable) episodeList);
+                intent.putExtra("book",book);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);*/
+            }
+        });
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Episode episode = episodeList.get(position);
+        String displayString = " "+ (position+1) + "  " + episode.getName();
+        String displayString_recent = " *"+ (position+1) + "  " + episode.getName();
+        //holder.name.setText(displayString);
+        if (this.position == position){
+            holder.name.setText(displayString_recent);
+        }else {
+            holder.name.setText(displayString);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return episodeList.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder{
+        View episodeView;
+        TextView name;
+
+        ViewHolder(View view){
+            super(view);
+            episodeView = view;
+            name = view.findViewById(R.id.tv_name);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 package com.drafens.dranacg.error;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import com.drafens.dranacg.R;
 public class ErrorActivity extends AppCompatActivity implements View.OnClickListener{
     public final static int MyNetworkException = 0;
     public final static int MyJsoupResolveException = 1;
+    public final static int MyFileWriteException = 2;
 
     private int detail;
     @Override
@@ -31,7 +33,10 @@ public class ErrorActivity extends AppCompatActivity implements View.OnClickList
                 textView.setText("网络错误");
                 break;
             case MyJsoupResolveException:
-                textView.setText("解析错误");
+                textView.setText("网络错误");
+                break;
+            case MyFileWriteException:
+                textView.setText("文件读写错误");
                 break;
         }
         bt_reconnect.setOnClickListener(this);
@@ -44,5 +49,11 @@ public class ErrorActivity extends AppCompatActivity implements View.OnClickList
                 finish();
                 break;
         }
+    }
+
+    public static void startActivity(Context context,int errorCode){
+        Intent intent = new Intent(context, ErrorActivity.class);
+        intent.putExtra("error_code", errorCode);
+        context.startActivity(intent);
     }
 }
