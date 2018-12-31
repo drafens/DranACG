@@ -35,8 +35,9 @@
             android:label="@string/error" />
         <activity
             android:name=".ui.activity.EpisodeActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".ui.activity.ComicImageHorizon" />
+            android:theme="@style/AppTheme.TransparentStatus"/>
+        <activity android:name=".ui.activity.ComicImageHorizon"
+            android:theme="@style/AppTheme.TransparentStatus"/>
         <activity android:name=".ui.activity.ComicImageVertical"/>
     </application>
 

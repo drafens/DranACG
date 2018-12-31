@@ -48,24 +48,15 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         holder.episodeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int position = holder.getAdapterPosition();
                 Intent intent;
                 switch (searchItem){
                     case Book.COMIC:
                         intent = new Intent(context, ComicImageHorizon.class);
                         intent.putExtra("episode",(Serializable) episodeList);
                         intent.putExtra("book",book);
+                        intent.putExtra("episode_position", position);
                         break;
-                        /*SharedPreferences pref = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                        String read_patterns = pref.getString("read_patterns","");
-                        if(read_patterns.equals("vertical")) {
-                            intent = new Intent(context, ComicImageVertical.class);
-                        }else {
-                            intent = new Intent(context, ComicImageHorizon.class);
-                        }
-                        break;*/
-                    /*case Book.ANIMATION:
-                        intent = new Intent(context,AnimationVideo.class);
-                        break;*/
                     default:
                         intent = new Intent(context,MainActivity.class);
                         break;

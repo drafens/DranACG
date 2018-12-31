@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.drafens.dranacg.Book;
+import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.error.MyFileWriteException;
 import com.drafens.dranacg.error.MyJsonEmptyException;
 import com.drafens.dranacg.error.MyJsonFormatException;
@@ -21,7 +22,7 @@ public class FavouriteManager {
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/drafens/";
     private static final String TAG = "FavouriteManager";
 
-    public static void add_favourite(Book book, int searchItem) throws MyFileWriteException{
+    public static void add_favourite(Book book, int searchItem) throws MyFileWriteException, MyJsonFormatException {
         JSONObject jsonObject;
         JSONArray jsonArray;
         try {
@@ -38,12 +39,12 @@ public class FavouriteManager {
             jsonObject.put("book",jsonArray);
             jsonObject.put("size",jsonArray.length());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new MyJsonFormatException();
         }
         writeFiles("files/","favourite_"+getJasonSearchItem(searchItem)+".json",jsonObject.toString());
     }
 
-    public static void delete_favourite(int i,int searchItem) throws MyFileWriteException{
+    public static void delete_favourite(int i,int searchItem) throws MyFileWriteException, MyJsonFormatException {
         JSONObject jsonObject;
         JSONArray jsonArray;
         try{
@@ -60,6 +61,7 @@ public class FavouriteManager {
             jsonObject.put("size",jsonArray.length());
         }catch (Exception e){
             e.printStackTrace();
+            throw new MyJsonFormatException();
         }
         writeFiles("files/","favourite_"+getJasonSearchItem(searchItem)+".json",jsonObject.toString());
     }
@@ -98,28 +100,29 @@ public class FavouriteManager {
         return !book.getLastReadChapter_id().equals(book.getUpdateChapter_id());
     }
 
-    public static void update_favourite(int i,Book book,int searchItem){
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        try {
-            String string = readFiles("files/favourite_" + getJasonSearchItem(searchItem) + ".json");
-            jsonObject = new JSONObject(string);
-            jsonArray = jsonObject.getJSONArray("book");
-            JSONObject object = bookToJson(book);
-            jsonArray.put(i,object);
-        }catch (Exception e){
-            jsonObject = new JSONObject();
-            jsonArray = new JSONArray();
-        }try{
-            jsonObject.put("book",jsonArray);
-            jsonObject.put("size",jsonArray.length());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            writeFiles("files/","favourite_"+getJasonSearchItem(searchItem)+".json",jsonObject.toString());
-        } catch (MyFileWriteException e) {
-            e.printStackTrace();
+    public static void update_favourite(Book book,int searchItem) throws MyFileWriteException {
+        int position = isFavourite(book.getWebsite(),book.getId(),searchItem);
+        if (position!=-1) {
+            JSONObject jsonObject;
+            JSONArray jsonArray;
+            try {
+                String string = readFiles("files/favourite_" + getJasonSearchItem(searchItem) + ".json");
+                jsonObject = new JSONObject(string);
+                jsonArray = jsonObject.getJSONArray("book");
+                JSONObject object = bookToJson(book);
+                jsonArray.put(position, object);
+            } catch (Exception e) {
+                jsonObject = new JSONObject();
+                jsonArray = new JSONArray();
+            }
+            try {
+                jsonObject.put("book", jsonArray);
+                jsonObject.put("size", jsonArray.length());
+                writeFiles("files/", "favourite_" + getJasonSearchItem(searchItem) + ".json", jsonObject.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MyFileWriteException();
+            }
         }
     }
 
@@ -140,6 +143,18 @@ public class FavouriteManager {
             throw new MyJsonFormatException();
         }
         return bookList;
+    }
+
+    public static int getEpisodePosition(String lastReadEpisode_id, List<Episode> episodeList) throws MyJsonFormatException {
+        int i;
+        if (lastReadEpisode_id.isEmpty()) return 0;
+        for (i=0;i<episodeList.size();i++){
+            if(lastReadEpisode_id.equals(episodeList.get(i).getId())){
+                break;
+            }
+        }
+        if (i<episodeList.size())  return i;
+        else throw new MyJsonFormatException();
     }
 
     private static void writeFiles(String catalog, String fileName, String data) throws MyFileWriteException {

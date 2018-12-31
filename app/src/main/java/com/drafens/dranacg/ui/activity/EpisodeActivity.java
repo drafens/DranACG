@@ -1,5 +1,6 @@
 package com.drafens.dranacg.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,11 +21,15 @@ import com.drafens.dranacg.R;
 import com.drafens.dranacg.Sites;
 import com.drafens.dranacg.error.ErrorActivity;
 import com.drafens.dranacg.error.MyFileWriteException;
+import com.drafens.dranacg.error.MyJsonFormatException;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.tools.ImageManager;
 import com.drafens.dranacg.ui.adapter.EpisodeAdapter;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener {
@@ -36,6 +41,8 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
 
     private Book book;
     private List<Episode> episodeList;
+    private int recentEpisodePosition;
+
     private int isFavourite;
 
     @Override
@@ -87,18 +94,22 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                int position;
                                 if (episodeList.size()>0) { //判断是否有章节
                                     textNonEpisode.setVisibility(View.GONE);
                                     if (isFavourite != -1) { //判断是否是搜藏
-                                        position = 10;
+                                        try {
+                                            recentEpisodePosition = FavouriteManager.getEpisodePosition(book.getLastReadChapter_id(), episodeList);
+                                        } catch (MyJsonFormatException e) {
+                                            recentEpisodePosition = 0;
+                                            ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsoupResolveException);
+                                        }
                                     } else {
-                                        position = 0;
+                                        recentEpisodePosition = 0;
                                     }
-                                    EpisodeAdapter adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, position);
+                                    EpisodeAdapter adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, recentEpisodePosition);
                                     recyclerView.setAdapter(adapter);
                                     recyclerView.addItemDecoration(new DividerItemDecoration(EpisodeActivity.this, DividerItemDecoration.VERTICAL));
-                                    recyclerView.scrollToPosition(position);
+                                    recyclerView.scrollToPosition(recentEpisodePosition);
 
                                 } else {
                                     textNonEpisode.setVisibility(View.VISIBLE);
@@ -133,6 +144,8 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                         FavouriteManager.delete_favourite(isFavourite,Book.COMIC);
                     } catch (MyFileWriteException e) {
                         ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyFileWriteException);
+                    } catch (MyJsonFormatException e){
+                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsonFormatException);
                     }
                     isFavourite = -1;
                 }else {
@@ -144,11 +157,17 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                         isFavourite = FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC);
                     } catch (MyFileWriteException e) {
                         ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyFileWriteException);
+                    } catch (MyJsonFormatException e){
+                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsonFormatException);
                     }
                 }
                 break;
             case R.id.fab_last_read:
-                break;
+                Intent intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
+                intent.putExtra("episode",(Serializable) episodeList);
+                intent.putExtra("book",book);
+                intent.putExtra("episode_position", recentEpisodePosition);
+                startActivity(intent);
         }
     }
 }
