@@ -3,6 +3,7 @@ package com.drafens.dranacg.ui.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,16 +21,16 @@ import com.drafens.dranacg.error.ErrorActivity;
 import com.drafens.dranacg.error.MyFileWriteException;
 import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.FavouriteManager;
+import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
 
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class ComicImageHorizon extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+    private String TAG = "ComicImageHorizon";
+
     private Book book;
     private List<Episode> episodeList;
     private List<String> imageUrlList;
@@ -82,31 +83,6 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
         }).start();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC)!=-1){
-            book.setLastReadChapter(episodeList.get(episodePosition).getName());
-            book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
-            //获取当前时间
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH)+1;
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int hour_int = calendar.get(Calendar.HOUR_OF_DAY);
-            String hour;
-            if (hour_int<10) hour = "0"+hour_int;
-            else hour = ""+hour_int;
-            int minute = calendar.get(Calendar.MINUTE);
-            book.setLastReadTime("阅读于："+year+"-"+month+"-"+day+" "+hour+":"+minute);
-            try {
-                FavouriteManager.update_favourite(book,Book.COMIC);
-            } catch (MyFileWriteException e) {
-                ErrorActivity.startActivity(ComicImageHorizon.this,ErrorActivity.MyFileWriteException);
-            }
-        }
-    }
-
     private void initView() {
         viewPager = findViewById(R.id.view_pager);
         textDetail = findViewById(R.id.tv_detail);
@@ -132,5 +108,20 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     @Override
     public void onPageScrollStateChanged(int i) {
 
+    }
+
+    @Override
+    protected void onStop() {
+        if(FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC)!=-1){
+            book.setLastReadChapter(episodeList.get(episodePosition).getName());
+            book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
+            book.setLastReadTime(Tools.getCurrentTime());
+            try {
+                FavouriteManager.update_favourite(book,Book.COMIC);
+            } catch (MyFileWriteException e) {
+                ErrorActivity.startActivity(ComicImageHorizon.this,ErrorActivity.MyFileWriteException);
+            }
+        }
+        super.onStop();
     }
 }

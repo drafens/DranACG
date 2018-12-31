@@ -45,7 +45,6 @@ public class FragmentBookSource extends Fragment {
     }
 
     //传数据至Activity
-
     public interface CallBackValue{
         void sendMessage(String str);
     }

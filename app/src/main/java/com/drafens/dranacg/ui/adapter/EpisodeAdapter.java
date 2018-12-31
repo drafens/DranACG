@@ -31,13 +31,15 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private Context context;
     private int searchItem;
     private int recentPosition;
+    private CallBackValue callBackValue;
 
-    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int recentPposition){
+    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int recentPosition,CallBackValue callBackValue){
         this.episodeList = episodeList;
         this.book = book;
         this.context = context;
         this.searchItem = searchItem;
-        this.recentPosition = recentPposition;
+        this.recentPosition = recentPosition;
+        this.callBackValue = callBackValue;
     }
 
     @NonNull
@@ -52,6 +54,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                 Intent intent;
                 switch (searchItem){
                     case Book.COMIC:
+                        callBackValue.sendMessage(position);
                         intent = new Intent(context, ComicImageHorizon.class);
                         intent.putExtra("episode",(Serializable) episodeList);
                         intent.putExtra("book",book);
@@ -72,7 +75,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         Episode episode = episodeList.get(position);
         String displayString = " "+ (position+1) + "  " + episode.getName();
         String displayString_recent = " *"+ (position+1) + "  " + episode.getName();
-        //holder.name.setText(displayString);
         if (recentPosition == position){
             holder.name.setText(displayString_recent);
         }else {
@@ -94,5 +96,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             episodeView = view;
             name = view.findViewById(R.id.tv_name);
         }
+    }
+
+    //传数据至Activity
+    public interface CallBackValue{
+        void sendMessage(int recentEpisodePosition);
     }
 }

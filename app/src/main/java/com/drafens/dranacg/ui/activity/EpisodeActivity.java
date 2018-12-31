@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -25,24 +26,23 @@ import com.drafens.dranacg.error.MyJsonFormatException;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.tools.ImageManager;
+import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.EpisodeAdapter;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener {
+public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener,EpisodeAdapter.CallBackValue {
     private static final String TAG = "EpisodeActivity";
     private RecyclerView recyclerView;
     private TextView textNonEpisode;
     private FloatingActionButton fabFavourite;
-    private  FloatingActionButton fabLastRead;
+    private FloatingActionButton fabLastRead;
+    private EpisodeAdapter adapter;
 
     private Book book;
     private List<Episode> episodeList;
     private int recentEpisodePosition;
-
     private int isFavourite;
 
     @Override
@@ -51,6 +51,15 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_episode);
         book = (Book) getIntent().getSerializableExtra("book");
         initView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (adapter!=null){
+            adapter.notifyDataSetChanged();
+            recyclerView.scrollToPosition(recentEpisodePosition);
+        }
     }
 
     private void initView() {
@@ -106,11 +115,10 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                                     } else {
                                         recentEpisodePosition = 0;
                                     }
-                                    EpisodeAdapter adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, recentEpisodePosition);
+                                    adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, recentEpisodePosition,EpisodeActivity.this);
                                     recyclerView.setAdapter(adapter);
                                     recyclerView.addItemDecoration(new DividerItemDecoration(EpisodeActivity.this, DividerItemDecoration.VERTICAL));
                                     recyclerView.scrollToPosition(recentEpisodePosition);
-
                                 } else {
                                     textNonEpisode.setVisibility(View.VISIBLE);
                                 }
@@ -153,6 +161,9 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                             .setAction("Action", null).show();
                     fabFavourite.setImageDrawable(getDrawable(R.drawable.ic_favorite_white_24dp));
                     try {
+                        book.setLastReadChapter(episodeList.get(recentEpisodePosition).getName());
+                        book.setLastReadChapter_id(episodeList.get(recentEpisodePosition).getId());
+                        book.setLastReadTime(Tools.getCurrentTime());
                         FavouriteManager.add_favourite(book,Book.COMIC);
                         isFavourite = FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC);
                     } catch (MyFileWriteException e) {
@@ -169,5 +180,10 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                 intent.putExtra("episode_position", recentEpisodePosition);
                 startActivity(intent);
         }
+    }
+
+    @Override
+    public void sendMessage(int recentEpisodePosition) {
+        this.recentEpisodePosition = recentEpisodePosition;
     }
 }

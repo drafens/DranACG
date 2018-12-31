@@ -18,8 +18,6 @@ import com.drafens.dranacg.ui.activity.EpisodeActivity;
 import java.util.List;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder>{
-    private static final int TYPE_HEADER = 2;
-    private static final int TYPE_ITEM = 1;
     private List<Book> bookList;
     private Context context;
     public SearchResultAdapter(Context context, List<Book> bookList){
