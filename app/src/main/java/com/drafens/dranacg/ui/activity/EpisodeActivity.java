@@ -10,7 +10,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -20,7 +19,7 @@ import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.Sites;
-import com.drafens.dranacg.error.ErrorActivity;
+import com.drafens.dranacg.error.MyError;
 import com.drafens.dranacg.error.MyFileWriteException;
 import com.drafens.dranacg.error.MyJsonFormatException;
 import com.drafens.dranacg.error.MyJsoupResolveException;
@@ -45,6 +44,8 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
     private int recentEpisodePosition;
     private int isFavourite;
 
+    private boolean isFirstRun = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,9 +57,11 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onStart() {
         super.onStart();
-        if (adapter!=null){
-            adapter.notifyDataSetChanged();
+        if (!isFirstRun){
             recyclerView.scrollToPosition(recentEpisodePosition);
+            adapter.notifyDataSetChanged();
+        }else {
+            isFirstRun = false;
         }
     }
 
@@ -110,7 +113,7 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                                             recentEpisodePosition = FavouriteManager.getEpisodePosition(book.getLastReadChapter_id(), episodeList);
                                         } catch (MyJsonFormatException e) {
                                             recentEpisodePosition = 0;
-                                            ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsoupResolveException);
+                                            MyError.show(EpisodeActivity.this,MyError.MyJsoupResolveException);
                                         }
                                     } else {
                                         recentEpisodePosition = 0;
@@ -127,7 +130,7 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 } catch (MyJsoupResolveException e) {
                     e.printStackTrace();
-                    ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsoupResolveException);
+                    MyError.show(EpisodeActivity.this,MyError.MyJsoupResolveException);
                 }
             }
         }).start();
@@ -151,9 +154,9 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                     try {
                         FavouriteManager.delete_favourite(isFavourite,Book.COMIC);
                     } catch (MyFileWriteException e) {
-                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyFileWriteException);
+                        MyError.show(EpisodeActivity.this,MyError.MyFileWriteException);
                     } catch (MyJsonFormatException e){
-                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsonFormatException);
+                        MyError.show(EpisodeActivity.this,MyError.MyJsonFormatException);
                     }
                     isFavourite = -1;
                 }else {
@@ -167,9 +170,9 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                         FavouriteManager.add_favourite(book,Book.COMIC);
                         isFavourite = FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC);
                     } catch (MyFileWriteException e) {
-                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyFileWriteException);
+                        MyError.show(EpisodeActivity.this,MyError.MyFileWriteException);
                     } catch (MyJsonFormatException e){
-                        ErrorActivity.startActivity(EpisodeActivity.this,ErrorActivity.MyJsonFormatException);
+                        MyError.show(EpisodeActivity.this,MyError.MyJsonFormatException);
                     }
                 }
                 break;

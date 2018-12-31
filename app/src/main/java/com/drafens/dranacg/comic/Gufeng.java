@@ -46,7 +46,6 @@ public class Gufeng extends Sites {
                 book.setType(element.select("p").get(1).text());
                 book.setUpdateTime("更新于："+element.select("p").get(2).text());
                 book.setIcon(elements.select("[class=itemImg]").get(i).select("mip-img").attr("src"));
-                Log.d(TAG, book.toString());
                 bookList.add(book);
                 i++;
             }
@@ -58,11 +57,19 @@ public class Gufeng extends Sites {
     }
 
     @Override
-    public Book getBook(Book book){
-        Log.d(TAG, "getBook: ");
-        //book.setUpdateChapter(updateChapter);
-        //book.setUpdateChapter_id(updateChapter_id);
-        //book.setUpdateTime(updateTime);
+    public Book getBook(Book book) throws MyJsoupResolveException {
+        try {
+            String url = url_gufeng + book.getId();
+            Document document = Jsoup.connect(url).get();
+            Elements elements = document.select("div[class=comic-view clearfix]");
+            book.setUpdateChapter(elements.select("div[class=pic_zi fs15]").get(0).select("dd").text());
+            book.setUpdateTime(elements.select("div[class=pic_zi fs15]").get(3).select("dd").text());
+            book.setLastReadChapter_id(elements.select("a[id=Subscribe_bak]").attr("href").replace(".html",""));
+            book.setBriefInfo(elements.select("p[class=txtDesc autoHeight]").text());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new MyJsoupResolveException();
+        }
         return book;
     }
 

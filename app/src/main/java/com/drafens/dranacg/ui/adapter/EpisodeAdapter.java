@@ -22,7 +22,6 @@ import com.drafens.dranacg.ui.activity.ComicImageVertical;
 import com.drafens.dranacg.ui.activity.MainActivity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder>{
@@ -55,6 +54,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                 switch (searchItem){
                     case Book.COMIC:
                         callBackValue.sendMessage(position);
+                        recentPosition = position;
                         intent = new Intent(context, ComicImageHorizon.class);
                         intent.putExtra("episode",(Serializable) episodeList);
                         intent.putExtra("book",book);

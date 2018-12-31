@@ -83,7 +83,6 @@ public class FavouriteManager {
                 object = jsonArray.getJSONObject(i);
                 String id = getString(object,"id");
                 String siteItem = getString(object,"webSite");
-                Log.d(TAG, siteItem+"*"+book_siteItem+"*"+id+"*"+book_id);
                 if(siteItem.equals(book_siteItem) && id.equals(book_id)){
                     isFavourite=i;
                     break;

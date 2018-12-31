@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,11 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
     private int updateSize;
     private int searchItem;
 
-    public FavouriteAdapter(Context context, int searchItem, List<Book> bookList, int updateSize) {
+    public FavouriteAdapter(Context context, int searchItem, List<Book> bookList,int updateSize) {
         this.bookList = bookList;
         this.context = context;
-        this.updateSize = updateSize;
         this.searchItem = searchItem;
+        this.updateSize = updateSize;
     }
 
     @NonNull
@@ -63,6 +64,8 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         ImageManager.getIcon(context,book.getIcon(),holder.icon);
         if (position<updateSize){
             holder.iv_update.setVisibility(View.VISIBLE);
+        }else {
+            holder.iv_update.setVisibility(View.GONE);
         }
     }
 
@@ -96,5 +99,11 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
             lastReadChapter = view.findViewById(R.id.tv_last_read_chapter);
             lastReadTime = view.findViewById(R.id.tv_last_read_time);
         }
+    }
+
+    public void updateData(int updateSize,List<Book> bookList){
+        this.updateSize = updateSize;
+        this.bookList = bookList;
+        notifyDataSetChanged();
     }
 }

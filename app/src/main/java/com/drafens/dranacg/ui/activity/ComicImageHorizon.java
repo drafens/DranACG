@@ -3,11 +3,9 @@ package com.drafens.dranacg.ui.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,7 +15,7 @@ import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.Sites;
-import com.drafens.dranacg.error.ErrorActivity;
+import com.drafens.dranacg.error.MyError;
 import com.drafens.dranacg.error.MyFileWriteException;
 import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.FavouriteManager;
@@ -25,7 +23,6 @@ import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ComicImageHorizon extends AppCompatActivity implements ViewPager.OnPageChangeListener {
@@ -69,7 +66,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     imageUrlList = sites != null ? sites.getImage(episodeList.get(episodePosition).getId()) : new ArrayList<String>();
                 } catch (MyNetworkException e) {
                     imageUrlList = new ArrayList<>();
-                    ErrorActivity.startActivity(ComicImageHorizon.this,ErrorActivity.MyNetworkException);
+                    MyError.show(ComicImageHorizon.this,MyError.MyNetworkException);
                 }
                 runOnUiThread(new Runnable() {
                     @Override
@@ -119,7 +116,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
             try {
                 FavouriteManager.update_favourite(book,Book.COMIC);
             } catch (MyFileWriteException e) {
-                ErrorActivity.startActivity(ComicImageHorizon.this,ErrorActivity.MyFileWriteException);
+                MyError.show(ComicImageHorizon.this,MyError.MyFileWriteException);
             }
         }
         super.onStop();

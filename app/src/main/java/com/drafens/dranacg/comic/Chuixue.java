@@ -65,15 +65,15 @@ public class Chuixue extends Sites {
     public Book getBook(Book book) throws MyJsoupResolveException{
         try {
             String url = url_chuixue + book.getId().replace("mh","manhua");
+            Log.d(TAG, url);
             Document document = Jsoup.connect(url).get();
             Elements elements = document.select("div[class=book-detail]");
             String updateChapter_id=elements.select("dd").get(4).select("a").attr("href");
             updateChapter_id=updateChapter_id.substring(0,updateChapter_id.indexOf(".html")).replace("http://www.chuixue.net/","/");
-            String briefInfo=elements.select("div[id=bookIntro]").text();
-            book.setBriefInfo(briefInfo);
             book.setUpdateChapter_id(updateChapter_id);
-            //book.setUpdateChapter(updateChapter);
-            //book.setUpdateTime(updateTime);
+            book.setBriefInfo(elements.select("div[id=bookIntro]").text());
+            book.setUpdateChapter(elements.select("dd").get(4).select("a").text());
+            book.setUpdateTime(elements.select("dd").get(3).text());
         }catch(Exception e){
             e.printStackTrace();
             throw new MyJsoupResolveException();

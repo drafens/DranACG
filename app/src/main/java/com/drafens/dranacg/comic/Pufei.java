@@ -67,14 +67,12 @@ public class Pufei extends Sites {
             String url = url_pufei + book.getId();
             Document document = Jsoup.connect(url).get();
             Elements elements = document.select("div[class=book-detail]");
-            String briefInfo=elements.select("div[id=bookIntro]").text();
+            book.setBriefInfo(elements.select("div[id=bookIntro]").text());
             Element element = document.select("div[class=chapter]").select("li").get(0);
             String updateChapter_id = element.select("a").attr("href");
-            updateChapter_id = updateChapter_id.substring(0,updateChapter_id.indexOf(".html"));
-            book.setBriefInfo(briefInfo);
-            book.setUpdateChapter_id(updateChapter_id);
-            //book.setUpdateChapter(updateChapter);
-            //book.setUpdateTime(updateTime);
+            book.setUpdateChapter_id(updateChapter_id.substring(0,updateChapter_id.indexOf(".html")));
+            book.setUpdateChapter(elements.select("dd").get(0).text());
+            book.setUpdateTime(elements.select("dd").get(1).text());
         }catch(Exception e){
             e.printStackTrace();
             throw new MyJsoupResolveException();

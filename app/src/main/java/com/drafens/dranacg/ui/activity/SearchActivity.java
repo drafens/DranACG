@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.Sites;
-import com.drafens.dranacg.error.ErrorActivity;
+import com.drafens.dranacg.error.MyError;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.ui.adapter.SearchResultAdapter;
@@ -123,7 +123,7 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
                             Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
                         }
                     }catch (MyNetworkException e){
-                        ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyNetworkException);
+                        MyError.show(SearchActivity.this,MyError.MyNetworkException);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -133,7 +133,7 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
                             }
                         });
                     }catch (MyJsoupResolveException e){
-                        ErrorActivity.startActivity(SearchActivity.this,ErrorActivity.MyJsoupResolveException);
+                        MyError.show(SearchActivity.this,MyError.MyJsoupResolveException);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
