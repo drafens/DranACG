@@ -45,7 +45,6 @@ public class ImageHorizonAdapter extends PagerAdapter {
             view.setTag(position);
             ImageView imageView = view.findViewById(R.id.iv_comic);
             ImageManager.getImage(context,imageList.get(position),imageView);
-            Log.d("TAG", "instantiateItem: "+position);
             cacheView.put(position,view);
         }
         container.addView(view);
@@ -56,5 +55,10 @@ public class ImageHorizonAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         View view = (View) object;
         container.removeView(view);
+    }
+
+    public void setImageList(List<String> imageList) {
+        this.imageList = imageList;
+        notifyDataSetChanged();
     }
 }

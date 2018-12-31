@@ -101,7 +101,7 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         }
     }
 
-    public void updateData(int updateSize,List<Book> bookList){
+    public void updateData(int updateSize, List<Book> bookList){
         this.updateSize = updateSize;
         this.bookList = bookList;
         notifyDataSetChanged();
