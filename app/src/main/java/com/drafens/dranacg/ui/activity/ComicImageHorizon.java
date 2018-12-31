@@ -115,9 +115,11 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     Sites sites = Sites.getSites(book.getWebsite());
                     if (sites != null) {
                         if (episodePosition > 0) {
-                            if (lastList.size()>0) imageUrlList.removeAll(nextList);
+                            boolean removeAble = true;
+                            if (lastList.size()>0) removeAble = false;imageUrlList.removeAll(nextList);
                             lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
                             imageUrlList.addAll(0, lastList);
+                            if (removeAble) imageUrlList.removeAll(nextList);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -178,9 +180,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             if(nextList.size()==0) removeAble = false;
                             nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
                             imageUrlList.addAll(0, nextList);
-                            if (removeAble){
-                                imageUrlList.removeAll(nextList);
-                            }
+                            if (removeAble) imageUrlList.removeAll(lastList);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
