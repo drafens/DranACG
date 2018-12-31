@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.R;
@@ -86,10 +87,20 @@ public class FragmentBookShelf extends Fragment {
                         FavouriteManager.update_favourite(book, Book.COMIC);
                     } catch (MyJsoupResolveException e) {
                         e.printStackTrace();
-                        MyError.show(getContext(), MyError.MyJsoupResolveException);
+                        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyError.show(getContext(), MyError.MyJsoupResolveException);
+                            }
+                        });
                     } catch (MyFileWriteException e) {
                         e.printStackTrace();
-                        MyError.show(getContext(), MyError.MyFileWriteException);
+                        Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyError.show(getContext(), MyError.MyFileWriteException);
+                            }
+                        });
                     }
                     if (FavouriteManager.isUpdate(book)) {
                         bookListUpdate.add(book);

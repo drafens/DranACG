@@ -3,12 +3,12 @@ package com.drafens.dranacg.ui.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.tools.ImageManager;
@@ -45,6 +45,7 @@ public class ImageHorizonAdapter extends PagerAdapter {
             view.setTag(position);
             ImageView imageView = view.findViewById(R.id.iv_comic);
             ImageManager.getImage(context,imageList.get(position),imageView);
+            Log.d("TAG", "instantiateItem: "+position);
             cacheView.put(position,view);
         }
         container.addView(view);

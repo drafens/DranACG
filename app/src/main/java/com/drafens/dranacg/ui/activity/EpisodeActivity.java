@@ -130,7 +130,12 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 } catch (MyJsoupResolveException e) {
                     e.printStackTrace();
-                    MyError.show(EpisodeActivity.this,MyError.MyJsoupResolveException);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MyError.show(EpisodeActivity.this,MyError.MyJsoupResolveException);
+                        }
+                    });
                 }
             }
         }).start();

@@ -23,14 +23,19 @@ import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ComicImageHorizon extends AppCompatActivity implements ViewPager.OnPageChangeListener {
     private String TAG = "ComicImageHorizon";
+    private static final int CONTAINER_SIZE = 20;
+    private static final int LAST_THRESHOLD = 3;
+    private static final int NEXT_THRESHOLD = 5;
 
     private Book book;
     private List<Episode> episodeList;
     private List<String> imageUrlList;
+    private List<List<Integer>> tagNumList;
     private int episodePosition;
     private int pagePosition;
 
@@ -66,7 +71,12 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     imageUrlList = sites != null ? sites.getImage(episodeList.get(episodePosition).getId()) : new ArrayList<String>();
                 } catch (MyNetworkException e) {
                     imageUrlList = new ArrayList<>();
-                    MyError.show(ComicImageHorizon.this,MyError.MyNetworkException);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MyError.show(ComicImageHorizon.this,MyError.MyNetworkException);
+                        }
+                    });
                 }
                 runOnUiThread(new Runnable() {
                     @Override
@@ -121,4 +131,30 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
         }
         super.onStop();
     }
+
+    private void getLastData(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<String> lastUrlList;
+                try {
+                    Sites sites = Sites.getSites(book.getWebsite());
+                    if (sites != null) {
+                        if (episodePosition > 0) {
+                            lastUrlList = sites.getImage(episodeList.get(episodePosition - 1).getId());
+                            for (int i = tagNumList.get(0).get(1),j = 0; (i >= 0)&(j < LAST_THRESHOLD); i--,j++) {
+                                imageUrlList.add(0, lastUrlList.get(i));
+                                imageUrlList.remove(imageUrlList.size() - 1);
+                                tagNumList.add(0, Arrays.asList(episodePosition - 1, i, lastUrlList.size()));
+                                tagNumList.remove(tagNumList.size() - 1);
+                            }
+                        }
+                    }
+                } catch (MyNetworkException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    private void getNextData(){}
 }

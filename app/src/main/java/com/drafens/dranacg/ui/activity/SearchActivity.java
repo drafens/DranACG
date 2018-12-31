@@ -123,20 +123,20 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
                             Toast.makeText(SearchActivity.this,"请选择网站",Toast.LENGTH_SHORT).show();
                         }
                     }catch (MyNetworkException e){
-                        MyError.show(SearchActivity.this,MyError.MyNetworkException);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                MyError.show(SearchActivity.this,MyError.MyNetworkException);
                                 reminderLoading.setVisibility(View.GONE);
                                 reminderNonResult.setVisibility(View.GONE);
                                 button.setClickable(true);
                             }
                         });
                     }catch (MyJsoupResolveException e){
-                        MyError.show(SearchActivity.this,MyError.MyJsoupResolveException);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                MyError.show(SearchActivity.this,MyError.MyJsoupResolveException);
                                 reminderLoading.setVisibility(View.GONE);
                                 reminderNonResult.setVisibility(View.GONE);
                                 button.setClickable(true);
