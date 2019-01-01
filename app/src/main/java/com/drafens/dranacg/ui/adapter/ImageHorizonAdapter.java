@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.tools.ImageManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageHorizonAdapter extends PagerAdapter {
@@ -58,7 +59,7 @@ public class ImageHorizonAdapter extends PagerAdapter {
     }
 
     public void setImageList(List<String> imageList) {
-        this.imageList = imageList;
+        this.imageList = new ArrayList<>(imageList);
         notifyDataSetChanged();
     }
 }

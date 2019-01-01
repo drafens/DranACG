@@ -1,6 +1,7 @@
 package com.drafens.dranacg.tools;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class Tools {
     //获取当前时间
@@ -15,5 +16,22 @@ public class Tools {
         else hour =""+hour_int;
         int minute = calendar.get(Calendar.MINUTE);
         return "阅读于："+year+"-"+month+"-"+day+" "+hour+":"+minute;
+    }
+
+    public static String listToString(List<String> list) {
+        if (list == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (String string : list) {
+            if (first) {
+                first = false;
+            } else {
+                result.append(",");
+            }
+            result.append(string);
+        }
+        return result.toString();
     }
 }

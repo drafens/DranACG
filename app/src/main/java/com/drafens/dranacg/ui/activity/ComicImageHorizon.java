@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -116,7 +117,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     if (sites != null) {
                         if (episodePosition > 0) {
                             boolean removeAble = true;
-                            if (lastList.size()>0) removeAble = false;imageUrlList.removeAll(nextList);
+                            if (lastList.size()==0) removeAble = false;
                             lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
                             imageUrlList.addAll(0, lastList);
                             if (removeAble) imageUrlList.removeAll(nextList);
@@ -179,7 +180,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             boolean removeAble = true;
                             if(nextList.size()==0) removeAble = false;
                             nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                            imageUrlList.addAll(0, nextList);
+                            imageUrlList.addAll(nextList);
                             if (removeAble) imageUrlList.removeAll(lastList);
                             runOnUiThread(new Runnable() {
                                 @Override
