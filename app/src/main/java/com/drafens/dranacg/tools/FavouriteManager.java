@@ -211,6 +211,16 @@ public class FavouriteManager {
         return string;
     }
 
+    private static int getInt(JSONObject object,String Tag){
+        int i;
+        try{
+            i = object.getInt(Tag);
+        }catch (Exception e){
+            i = 0;
+        }
+        return i;
+    }
+
     private static String getJasonSearchItem(int searchItem){
         String tab="";
         switch (searchItem){
@@ -260,7 +270,7 @@ public class FavouriteManager {
         book.setLastReadChapter_id(getString(object,"lastReadChapter_id"));
         book.setLastReadTime(getString(object,"lastReadTime"));
         book.setBriefInfo(getString(object,"briefInfo"));
-        book.setReadMode(getString(object,"readMode"));
+        book.setReadMode(getInt(object,"readMode"));
         book.setReadPosition(getString(object,"readPosition"));
         return book;
     }

@@ -5,8 +5,12 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 
 public class Book implements Serializable {
+    //searchItem
     public static final int ANIMATION = 0;
     public static final int COMIC = 1;
+    //readMode:default=0
+    public static final int HORIZON = 1;
+    public static final int VERTICAL = 2;
     private String id;
     private String website;
     private String name="";
@@ -21,7 +25,7 @@ public class Book implements Serializable {
     private String lastReadChapter_id="";
     private String lastReadTime="";
     private String readPosition="";
-    private String readMode="";
+    private int readMode=0;
 
     public Book(String website, String id){
         this.website = website;
@@ -70,7 +74,7 @@ public class Book implements Serializable {
     public String getReadPosition() {
         return readPosition;
     }
-    public String getReadMode() {
+    public int getReadMode() {
         return readMode;
     }
 
@@ -107,7 +111,7 @@ public class Book implements Serializable {
     public void setBriefInfo(String briefInfo) {
         this.briefInfo = briefInfo;
     }
-    public void setReadMode(String readMode) {
+    public void setReadMode(int readMode) {
         this.readMode = readMode;
     }
     public void setReadPosition(String readPosition) {
