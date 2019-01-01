@@ -1,5 +1,6 @@
 package com.drafens.dranacg.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +19,7 @@ import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.ui.activity.ComicImageHorizon;
-import com.drafens.dranacg.ui.activity.ComicImageVertical;
+import com.drafens.dranacg.ui.activity.EpisodeActivity;
 import com.drafens.dranacg.ui.activity.MainActivity;
 
 import java.io.Serializable;
@@ -30,15 +31,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private Context context;
     private int searchItem;
     private int recentPosition;
-    private CallBackValue callBackValue;
 
-    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int recentPosition,CallBackValue callBackValue){
+    public EpisodeAdapter(Context context,List<Episode> episodeList,Book book,int searchItem, int recentPosition){
         this.episodeList = episodeList;
         this.book = book;
         this.context = context;
         this.searchItem = searchItem;
         this.recentPosition = recentPosition;
-        this.callBackValue = callBackValue;
     }
 
     @NonNull
@@ -53,7 +52,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                 Intent intent;
                 switch (searchItem){
                     case Book.COMIC:
-                        callBackValue.sendMessage(position);
                         recentPosition = position;
                         intent = new Intent(context, ComicImageHorizon.class);
                         intent.putExtra("episode",(Serializable) episodeList);
@@ -64,7 +62,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                         intent = new Intent(context,MainActivity.class);
                         break;
                 }
-                context.startActivity(intent);
+                ((Activity) context).startActivityForResult(intent, 1);
+                //context.startActivity(intent);
             }
         });
         return holder;
@@ -98,8 +97,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         }
     }
 
-    //传数据至Activity
-    public interface CallBackValue{
-        void sendMessage(int recentEpisodePosition);
+    public void setRecentPosition(int recentPosition) {
+        this.recentPosition = recentPosition;
+        notifyDataSetChanged();
     }
 }

@@ -2,6 +2,7 @@ package com.drafens.dranacg.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -31,7 +33,7 @@ import com.drafens.dranacg.ui.adapter.EpisodeAdapter;
 import java.io.Serializable;
 import java.util.List;
 
-public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener,EpisodeAdapter.CallBackValue {
+public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "EpisodeActivity";
     private RecyclerView recyclerView;
     private TextView textNonEpisode;
@@ -44,25 +46,12 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
     private int recentEpisodePosition;
     private int isFavourite;
 
-    private boolean isFirstRun = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         book = (Book) getIntent().getSerializableExtra("book");
         initView();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (!isFirstRun){
-            recyclerView.scrollToPosition(recentEpisodePosition);
-            adapter.notifyDataSetChanged();
-        }else {
-            isFirstRun = false;
-        }
     }
 
     private void initView() {
@@ -118,7 +107,7 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                                     } else {
                                         recentEpisodePosition = 0;
                                     }
-                                    adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, recentEpisodePosition,EpisodeActivity.this);
+                                    adapter = new EpisodeAdapter(EpisodeActivity.this, episodeList, book, Book.COMIC, recentEpisodePosition);
                                     recyclerView.setAdapter(adapter);
                                     recyclerView.addItemDecoration(new DividerItemDecoration(EpisodeActivity.this, DividerItemDecoration.VERTICAL));
                                     recyclerView.scrollToPosition(recentEpisodePosition);
@@ -186,12 +175,15 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                 intent.putExtra("episode",(Serializable) episodeList);
                 intent.putExtra("book",book);
                 intent.putExtra("episode_position", recentEpisodePosition);
-                startActivity(intent);
+                startActivityForResult(intent,1);
         }
     }
 
     @Override
-    public void sendMessage(int recentEpisodePosition) {
-        this.recentEpisodePosition = recentEpisodePosition;
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        recentEpisodePosition = resultCode;
+        adapter.setRecentPosition(recentEpisodePosition);
+        recyclerView.scrollToPosition(recentEpisodePosition);
     }
 }
