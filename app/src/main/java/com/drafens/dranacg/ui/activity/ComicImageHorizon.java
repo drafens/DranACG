@@ -84,7 +84,13 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     @Override
     public void onPageSelected(int i) {
-        pagePosition=i;
+        if (pagePosition>=lastList.size()+currentList.size()){
+            pagePosition=i-lastList.size()-currentList.size();
+        }else if (i>=lastList.size()){
+            pagePosition=i-lastList.size();
+        }else {
+            pagePosition=i;
+        }
         setDetailText();
     }
 
@@ -125,6 +131,8 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                                 @Override
                                 public void run() {
                                     adapter.setImageList(imageUrlList);
+                                    episodePosition -= 1;
+                                    viewPager.setCurrentItem(lastList.size(),false);
                                 }
                             });
                         }
@@ -186,6 +194,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                                 @Override
                                 public void run() {
                                     adapter.setImageList(imageUrlList);
+                                    episodePosition += 1;
                                 }
                             });
                         }
