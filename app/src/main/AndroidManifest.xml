@@ -35,7 +35,8 @@
             android:theme="@style/AppTheme.TransparentStatus"/>
         <activity android:name=".ui.activity.ComicImageHorizon"
             android:theme="@style/AppTheme.TransparentStatus"/>
-        <activity android:name=".ui.activity.ComicImageVertical"/>
+        <activity android:name=".ui.activity.ComicImageVertical"
+            android:theme="@style/AppTheme.TransparentStatus"/>
     </application>
 
 </manifest>

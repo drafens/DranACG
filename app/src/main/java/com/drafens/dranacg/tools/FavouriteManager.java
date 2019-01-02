@@ -1,5 +1,7 @@
 package com.drafens.dranacg.tools;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
 
 import com.drafens.dranacg.Book;
@@ -151,6 +153,14 @@ public class FavouriteManager {
         }
         if (i<episodeList.size())  return i;
         else throw new MyJsonFormatException();
+    }
+
+    public static int getReadModeDefault(Context context){
+        int def;
+        SharedPreferences preferences;
+        preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+        def = preferences.getInt("read_mode",0);
+        return def;
     }
 
     private static void writeFiles(String catalog, String fileName, String data) throws MyFileWriteException {

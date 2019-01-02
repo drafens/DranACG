@@ -69,6 +69,27 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
         getInitCurrentData();
     }
 
+    @Override
+    protected void onStop() {
+        if(FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC)!=-1){
+            book.setLastReadChapter(episodeList.get(episodePosition).getName());
+            book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
+            book.setLastReadTime(Tools.getCurrentTime());
+            try {
+                FavouriteManager.update_favourite(book,Book.COMIC);
+            } catch (MyFileWriteException e) {
+                MyError.show(ComicImageHorizon.this,MyError.MyFileWriteException);
+            }
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(episodePosition);
+        super.onBackPressed();
+    }
+
     private void initView() {
         viewPager = findViewById(R.id.view_pager);
         textDetail = findViewById(R.id.tv_detail);
@@ -101,27 +122,6 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     @Override
     public void onPageScrollStateChanged(int i) {
 
-    }
-
-    @Override
-    protected void onStop() {
-        if(FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC)!=-1){
-            book.setLastReadChapter(episodeList.get(episodePosition).getName());
-            book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
-            book.setLastReadTime(Tools.getCurrentTime());
-            try {
-                FavouriteManager.update_favourite(book,Book.COMIC);
-            } catch (MyFileWriteException e) {
-                MyError.show(ComicImageHorizon.this,MyError.MyFileWriteException);
-            }
-        }
-        super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        setResult(episodePosition);
-        super.onBackPressed();
     }
 
     private void getInitCurrentData(){

@@ -169,7 +169,19 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
             case R.id.fab_last_read:
-                Intent intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
+                Intent intent;
+                if (book.getReadMode()==Book.HORIZON){
+                    intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
+                }else if (book.getReadMode()==Book.VERTICAL){
+                    intent = new Intent(EpisodeActivity.this, ComicImageVertical.class);
+                }else{
+                    if (FavouriteManager.getReadModeDefault(EpisodeActivity.this)==Book.VERTICAL){
+                        intent = new Intent(EpisodeActivity.this, ComicImageVertical.class);
+                    }else {
+                        intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
+                    }
+                }
+                //Intent intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
                 intent.putExtra("episode",(Serializable) episodeList);
                 intent.putExtra("book",book);
                 intent.putExtra("episode_position", recentEpisodePosition);

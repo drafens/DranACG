@@ -13,7 +13,9 @@ import android.widget.TextView;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
+import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.ui.activity.ComicImageHorizon;
+import com.drafens.dranacg.ui.activity.ComicImageVertical;
 import com.drafens.dranacg.ui.activity.MainActivity;
 
 import java.io.Serializable;
@@ -47,7 +49,17 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                 switch (searchItem){
                     case Book.COMIC:
                         recentPosition = position;
-                        intent = new Intent(context, ComicImageHorizon.class);
+                        if (book.getReadMode()==Book.HORIZON){
+                            intent = new Intent(context, ComicImageHorizon.class);
+                        }else if (book.getReadMode()==Book.VERTICAL){
+                            intent = new Intent(context, ComicImageVertical.class);
+                        }else{
+                            if (FavouriteManager.getReadModeDefault(context)==Book.VERTICAL){
+                                intent = new Intent(context, ComicImageVertical.class);
+                            }else {
+                                intent = new Intent(context, ComicImageVertical.class);
+                            }
+                        }
                         intent.putExtra("episode",(Serializable) episodeList);
                         intent.putExtra("book",book);
                         intent.putExtra("episode_position", position);
