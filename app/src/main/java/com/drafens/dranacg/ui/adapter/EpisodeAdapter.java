@@ -3,13 +3,8 @@ package com.drafens.dranacg.ui.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +14,6 @@ import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.ui.activity.ComicImageHorizon;
-import com.drafens.dranacg.ui.activity.EpisodeActivity;
 import com.drafens.dranacg.ui.activity.MainActivity;
 
 import java.io.Serializable;
@@ -63,7 +57,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                         break;
                 }
                 ((Activity) context).startActivityForResult(intent, 1);
-                //context.startActivity(intent);
             }
         });
         return holder;

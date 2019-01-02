@@ -1,7 +1,6 @@
 package com.drafens.dranacg.tools;
 
 import android.os.Environment;
-import android.util.Log;
 
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
@@ -20,7 +19,6 @@ import java.util.List;
 
 public class FavouriteManager {
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/drafens/";
-    private static final String TAG = "FavouriteManager";
 
     public static void add_favourite(Book book, int searchItem) throws MyFileWriteException, MyJsonFormatException {
         JSONObject jsonObject;
@@ -95,7 +93,6 @@ public class FavouriteManager {
     }
 
     public static boolean isUpdate(Book book){
-        Log.d(TAG, book.getLastReadChapter_id()+""+book.getUpdateChapter_id());
         return !book.getLastReadChapter_id().equals(book.getUpdateChapter_id());
     }
 

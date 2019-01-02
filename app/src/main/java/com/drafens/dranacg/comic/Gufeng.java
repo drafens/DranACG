@@ -1,7 +1,5 @@
 package com.drafens.dranacg.comic;
 
-import android.util.Log;
-
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.Sites;
@@ -17,14 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Gufeng extends Sites {
-    private static String TAG = "Gufeng";
     private static String url_gufeng = "https://m.gufengmh.com";
     @Override
     public List<Book> getSearch(String search_id) throws MyNetworkException,MyJsoupResolveException {
         List<Book> bookList=new ArrayList<>();
         Document document;
         try {
-            Log.d(TAG, url_gufeng + "/search/?keywords=" + search_id);
             String url = url_gufeng + "/search/?keywords=" + search_id;
             document = Jsoup.connect(url).header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
                     .header("referer", "m.gufengmh.com")
@@ -62,8 +58,8 @@ public class Gufeng extends Sites {
             String url = url_gufeng + book.getId();
             Document document = Jsoup.connect(url).get();
             Elements elements = document.select("div[class=comic-view clearfix]");
-            book.setUpdateChapter(elements.select("div[class=pic_zi fs15]").get(0).select("dd").text());
-            book.setUpdateTime(elements.select("div[class=pic_zi fs15]").get(3).select("dd").text());
+            book.setUpdateChapter(elements.select("dl[class=pic_zi fs15]").get(0).select("dd").text());
+            book.setUpdateTime(elements.select("dl[class=pic_zi fs15]").get(3).select("dd").text());
             book.setLastReadChapter_id(elements.select("a[id=Subscribe_bak]").attr("href").replace(".html",""));
             book.setBriefInfo(elements.select("p[class=txtDesc autoHeight]").text());
         }catch (Exception e){
@@ -130,7 +126,6 @@ public class Gufeng extends Sites {
                     urlList.add("https://res.gufengmh.com" + chapterPath + string.substring(1, string.length() - 1));
                 }
             }
-            Log.d(TAG, urlList.toString());
         } catch (Exception e) {
             e.printStackTrace();
             throw new MyNetworkException();

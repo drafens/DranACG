@@ -26,10 +26,5 @@ public class MyError{
                 break;
         }
         Toast.makeText(context,detail,Toast.LENGTH_LONG).show();
-        /*Snackbar.make(view, detail, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        Intent intent = new Intent(context, MyError.class);
-        intent.putExtra("error_code", errorCode);
-        context.startActivity(intent);*/
     }
 }

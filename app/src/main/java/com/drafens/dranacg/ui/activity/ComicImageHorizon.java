@@ -6,8 +6,6 @@ import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,25 +23,27 @@ import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ComicImageHorizon extends AppCompatActivity implements ViewPager.OnPageChangeListener {
-    private String TAG = "ComicImageHorizon";
-
     private Book book;
     private List<Episode> episodeList;
     private List<String> imageUrlList;
+
     private List<String> lastList;
     private List<String> currentList;
     private List<String> nextList;
+    private List<List<Integer>> tagList = new ArrayList<>();
     private int episodePosition;
-    private int pagePosition;
+    private int adapterPosition;
 
     private ViewPager viewPager;
     private TextView textDetail;
     private ImageHorizonAdapter adapter;
 
-    private boolean threadPermmit = false;
+    private boolean threadPermit = false;
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -76,7 +76,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     }
 
     private void setDetailText(){
-        String string = " "+book.getName()+" "+episodeList.get(episodePosition).getName()+" "+(pagePosition+1) + "/" + (currentList.size())+" ";
+        String string = " "+book.getName()+" "+episodeList.get(tagList.get(adapterPosition).get(0)).getName()+" "+(tagList.get(adapterPosition).get(1)+1) + "/" + (tagList.get(adapterPosition).get(2))+" ";
         textDetail.setText(string);
     }
 
@@ -87,18 +87,13 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     @Override
     public void onPageSelected(int i) {
-        if (i>=lastList.size()+currentList.size()){
+        adapterPosition = i;
+        if (tagList.get(adapterPosition).get(0) > episodePosition) {
             episodePosition += 1;
-            pagePosition=(i-lastList.size()-currentList.size());
             getNextData();
-            threadPermmit = false;
-        }else if (i>=lastList.size()){
-            pagePosition=i-lastList.size();
-        }else {
-            pagePosition=i;
+        } else if (tagList.get(adapterPosition).get(0) < episodePosition) {
             episodePosition -= 1;
             getLastData();
-            threadPermmit = false;
         }
         setDetailText();
     }
@@ -138,6 +133,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     currentList = sites != null ? sites.getImage(episodeList.get(episodePosition).getId()) : new ArrayList<String>();
                 } catch (MyNetworkException e) {
                     currentList = new ArrayList<>();
+                    threadPermit = true;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -152,6 +148,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         lastList = new ArrayList<>();
                         nextList = new ArrayList<>();
                         adapter = new ImageHorizonAdapter(ComicImageHorizon.this,imageUrlList);
+                        getTagList(0,currentList.size());
                         viewPager.setAdapter(adapter);
                         setDetailText();
                         getInitNextData();
@@ -162,8 +159,8 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     }
 
     private void getLastData(){
-        Log.d(TAG, "getLastData: ");
-        if(episodePosition>0 && threadPermmit) {
+        if(threadPermit) {
+            threadPermit = false;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -171,16 +168,20 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     try {
                         Sites sites = Sites.getSites(book.getWebsite());
                         if (sites != null) {
-                            nextList = new ArrayList<>(currentList);
-                            currentList = new ArrayList<>(lastList);
-                            lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
-                            imageUrlList.addAll(0, lastList);
-                            imageUrlList.removeAll(nextList);
+                                nextList = new ArrayList<>(currentList);
+                                currentList = new ArrayList<>(lastList);
+                            if(episodePosition>0) {
+                                lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
+                                imageUrlList.addAll(0, lastList);
+                            }else {
+                                lastList = new ArrayList<>();
+                            }
+                            imageUrlList.removeAll(nextListBak);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    getTagList(-1, lastList.size());
                                     adapter.setImageList(imageUrlList, lastList.size());
-                                    threadPermmit = true;
                                 }
                             });
                         }
@@ -188,17 +189,17 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         lastList = new ArrayList<>(currentList);
                         currentList = new ArrayList<>(nextList);
                         nextList = new ArrayList<>(nextListBak);
-                        threadPermmit = true;
                         e.printStackTrace();
                     }
                 }
             }).start();
         }
+        threadPermit = true;
     }
 
     private void getNextData() {
-        if (episodePosition < episodeList.size() - 1 && threadPermmit) {
-            Log.d(TAG, "getNextData: ");
+        if (threadPermit) {
+            threadPermit = false;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -208,14 +209,18 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         if (sites != null) {
                             lastList = new ArrayList<>(currentList);
                             currentList = new ArrayList<>(nextList);
-                            nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                            imageUrlList.addAll(nextList);
-                            imageUrlList.removeAll(lastList);
+                            if (episodePosition < episodeList.size() - 1) {
+                                nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
+                                imageUrlList.addAll(nextList);
+                            }else {
+                                nextList = new ArrayList<>();
+                            }
+                            imageUrlList.removeAll(lastListBak);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.setImageList(imageUrlList, -lastList.size());
-                                    threadPermmit = true;
+                                    getTagList(1,nextList.size());
+                                    adapter.setImageList(imageUrlList, -lastListBak.size());
                                 }
                             });
                         }
@@ -223,64 +228,86 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         nextList = new ArrayList<>(currentList);
                         currentList = new ArrayList<>(lastList);
                         lastList = new ArrayList<>(lastListBak);
-                        threadPermmit = true;
+                    }
+                }
+            }).start();
+        }
+        threadPermit = true;
+    }
+
+    private void getInitLastData() {
+        if (episodePosition > 0) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Sites sites = Sites.getSites(book.getWebsite());
+                        if (sites != null) {
+                            lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
+                            imageUrlList.addAll(0, lastList);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getTagList(-1, lastList.size());
+                                    adapter.setImageList(imageUrlList, lastList.size());
+                                }
+                            });
+                        }
+                    } catch (MyNetworkException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+        threadPermit = true;
+    }
+
+    private void getInitNextData(){
+        if (episodePosition < episodeList.size()-1) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Sites sites = Sites.getSites(book.getWebsite());
+                        if (sites != null) {
+                            nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
+                            imageUrlList.addAll(nextList);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getTagList(1, nextList.size());
+                                    adapter.setImageList(imageUrlList, 0);
+                                    getInitLastData();
+                                }
+                            });
+                        }
+                    } catch (MyNetworkException e) {
+                        e.printStackTrace();
+                        threadPermit = true;
                     }
                 }
             }).start();
         }
     }
 
-    private void getInitLastData(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Sites sites = Sites.getSites(book.getWebsite());
-                    if (sites != null) {
-                        if (episodePosition > 0) {
-                            lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
-                            imageUrlList.addAll(0, lastList);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.setImageList(imageUrlList,lastList.size());
-                                    threadPermmit = true;
-                                }
-                            });
-                        }
-                    }
-                } catch (MyNetworkException e) {
-                    e.printStackTrace();
-                    threadPermmit = true;
+    //key接收 -1 Last;0 Current +1 Next
+    private void getTagList(final int key,int size){
+        List<Integer> list;
+        for (int i=0;i<size;i++){
+            list = Arrays.asList(episodePosition + key,i,size);
+            if (key == -1) {
+                tagList.add(i, list);
+            }else if (key == 1 || key == 0){
+                tagList.add(list);
+            }
+        }
+        if (key == 1 || key ==-1) {
+            for (int i = 0; i < tagList.size(); i++) {
+                if (tagList.get(i).get(0) == (episodePosition - key - key)) {
+                    tagList.remove(i);
+                    i--;
                 }
             }
-        }).start();
-    }
-
-    private void getInitNextData(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Sites sites = Sites.getSites(book.getWebsite());
-                    if (sites != null) {
-                        if (episodePosition < episodeList.size()-1) {
-                            nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                            imageUrlList.addAll(nextList);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.setImageList(imageUrlList,0);
-                                    getInitLastData();
-                                }
-                            });
-                        }
-                    }
-                } catch (MyNetworkException e) {
-                    e.printStackTrace();
-                    threadPermmit = true;
-                }
-            }
-        }).start();
+        }
     }
 }

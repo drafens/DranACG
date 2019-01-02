@@ -13,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -24,7 +23,6 @@ import com.drafens.dranacg.ui.fragment.FragmentDownload;
 import com.drafens.dranacg.R;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener, FragmentBookSource.CallBackValue {
-    private static final String TAG = "MainActivity";
     private Toolbar toolbar;
     private Fragment fragment=new FragmentBookShelf();
     private int preNavId = R.id.nav_book_shelf;
@@ -79,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if (preNavId != id) {
             preNavId = id;
-            Log.d(TAG, "onNavigationItemSelected: ");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_main, fragment);
             fragmentTransaction.commit();

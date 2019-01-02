@@ -37,10 +37,10 @@ public class ImageHorizonAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_image_horizon,container,false);
-        view.setTag(position);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_image_horizon, container, false);
         ImageView imageView = view.findViewById(R.id.iv_comic);
         ImageManager.getImage(context,imageList.get(position),imageView);
+        view.setTag(position);
         container.addView(view);
         return view;
     }

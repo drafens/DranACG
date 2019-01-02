@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class Pufei extends Sites {
-    private static final String TAG = "Pufei";
     private static String url_pufei = "http://m.pufei.net";
 
     @Override
@@ -31,7 +30,6 @@ public class Pufei extends Sites {
         try {
             search_id = URLEncoder.encode(search_id, "gb2312");
             String url = url_pufei + "/e/search/?searchget=1&tbname=mh&show=title,player,playadmin,bieming,pinyin&tempid=4&keyboard=" + search_id;
-            Log.d(TAG, "getSearch: " + url);
             document = Jsoup.connect(url).header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
                     .header("referer", "m.pufei.com")
                     .header("Accept-Language", "zh-CN,zh;q=0.8")

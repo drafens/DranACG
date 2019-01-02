@@ -9,7 +9,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class SearchActivity extends AppCompatActivity implements TextView.OnEditorActionListener{
-    private String TAG = "SearchActivity";
     private RecyclerView recyclerView;
     private EditText editText;
     private FloatingActionButton button;
@@ -116,7 +114,6 @@ public class SearchActivity extends AppCompatActivity implements TextView.OnEdit
                                     SearchResultAdapter adapter = new SearchResultAdapter(SearchActivity.this, bookList);
                                     recyclerView.setAdapter(adapter);
                                     recyclerView.addItemDecoration(new DividerItemDecoration(SearchActivity.this, DividerItemDecoration.VERTICAL));
-                                    Log.d(TAG, "run: ");
                                 }
                             });
                         }else {
