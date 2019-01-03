@@ -111,10 +111,10 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     public void onPageSelected(int i) {
         Log.d("TAG", "onPageSelected: "+i);
         adapterPosition = i;
-        if (tagList.get(adapterPosition).get(0) > episodePosition) {
+        if (tagList.get(adapterPosition).get(0) == episodePosition+1) {
             episodePosition += 1;
             getNextData();
-        } else if (tagList.get(adapterPosition).get(0) < episodePosition) {
+        } else if (tagList.get(adapterPosition).get(0) == episodePosition-1) {
             episodePosition -= 1;
             getLastData();
         }

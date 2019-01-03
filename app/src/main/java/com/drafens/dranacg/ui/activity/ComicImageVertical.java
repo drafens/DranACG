@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,17 +16,16 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.drafens.dranacg.Book;
-import com.drafens.dranacg.Episode;
-import com.drafens.dranacg.R;
-import com.drafens.dranacg.Sites;
-import com.drafens.dranacg.error.MyError;
 import com.drafens.dranacg.error.MyFileWriteException;
-import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.tools.Tools;
-import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
 import com.drafens.dranacg.ui.adapter.ImageVerticalAdapter;
+import com.drafens.dranacg.Book;
+import com.drafens.dranacg.Episode;
+import com.drafens.dranacg.error.MyError;
+import com.drafens.dranacg.error.MyNetworkException;
+import com.drafens.dranacg.R;
+import com.drafens.dranacg.Sites;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -34,24 +33,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ComicImageVertical extends AppCompatActivity{
+
     private Book book;
     private List<Episode> episodeList;
     private List<String> imageUrlList;
-
-    private List<String> lastList;
-    private List<String> currentList;
     private List<String> nextList;
+    private List<String> currentList;
+    private List<String> lastList;
     private List<List<Integer>> tagList = new ArrayList<>();
     private int episodePosition;
     private int adapterPosition = 0;
 
-    private RecyclerView recyclerView;
+    private SwipeRefreshLayout refreshLayout;
     private TextView textDetail;
-    private ImageVerticalAdapter adapter;
+    private RecyclerView recyclerView;
     private LinearLayoutManager manager;
+    private ImageVerticalAdapter adapter;
 
     private boolean threadPermit = false;
-    private boolean nextPermit = true;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -98,45 +97,46 @@ public class ComicImageVertical extends AppCompatActivity{
         super.onBackPressed();
     }
 
-    public void initView(){
+    private void initView() {
         recyclerView = findViewById(R.id.recycler);
-
-        recyclerView.setFocusable(false);
-
-        /*recyclerView.setFocusableInTouchMode(false);
-        recyclerView.setFocusable(false);
-        recyclerView.setHasFixedSize(true);*/
-
-
         textDetail=findViewById(R.id.tv_detail);
+        refreshLayout = findViewById(R.id.refresh_layout);
         manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayout.VERTICAL);
         recyclerView.setLayoutManager(manager);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getLastData();
+            }
+        });
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 int i = manager.findFirstVisibleItemPosition();
                 int j = manager.findLastVisibleItemPosition();
-                Log.d("TAG", i+"\n"+j+"\n"+episodePosition);
-            }
-
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                Log.d("TAG", "onScrollStateChanged: "+newState);
+                if(i>=0) {
+                    adapterPosition = i;
+                    setDetailText();
+                }
+                if (j>0) {
+                    if (tagList.get(j).get(0) == episodePosition+1) {
+                        episodePosition += 1;
+                        getNextData();
+                    }
+                }
             }
         });
     }
 
     private void setDetailText(){
-        if (adapterPosition>=0) {
-            String string = " " + book.getName() + " " + episodeList.get(tagList.get(adapterPosition).get(0)).getName() + " " + (tagList.get(adapterPosition).get(1) + 1) + "/" + (tagList.get(adapterPosition).get(2)) + " ";
-            textDetail.setText(string);
-        }
+        String string = " "+book.getName()+" "+episodeList.get(tagList.get(adapterPosition).get(0)).getName()+" "+(tagList.get(adapterPosition).get(1)+1) + "/" + (tagList.get(adapterPosition).get(2))+" ";
+        textDetail.setText(string);
     }
 
-    private void getInitCurrentData(){
+    private void getInitCurrentData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -149,18 +149,18 @@ public class ComicImageVertical extends AppCompatActivity{
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            MyError.show(ComicImageVertical.this,MyError.MyNetworkException);
+                            MyError.show(ComicImageVertical.this, MyError.MyNetworkException);
                         }
                     });
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        imageUrlList = new ArrayList<>(currentList);
                         lastList = new ArrayList<>();
                         nextList = new ArrayList<>();
-                        adapter = new ImageVerticalAdapter(ComicImageVertical.this,imageUrlList);
-                        getTagList(0,currentList.size());
+                        imageUrlList = new ArrayList<>(currentList);
+                        getTagList(0, imageUrlList.size());
+                        adapter = new ImageVerticalAdapter(ComicImageVertical.this, imageUrlList);
                         recyclerView.setAdapter(adapter);
                         setDetailText();
                         getInitNextData();
@@ -170,47 +170,9 @@ public class ComicImageVertical extends AppCompatActivity{
         }).start();
     }
 
-    private void getLastData(){
-        if(threadPermit) {
-            threadPermit = false;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final List<String> nextListBak = new ArrayList<>(nextList);
-                    try {
-                        Sites sites = Sites.getSites(book.getWebsite());
-                        if (sites != null) {
-                            nextList = new ArrayList<>(currentList);
-                            currentList = new ArrayList<>(lastList);
-                            if(episodePosition>0) {
-                                lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
-                                imageUrlList.addAll(0, lastList);
-                            }else {
-                                lastList = new ArrayList<>();
-                            }
-                            imageUrlList.removeAll(nextListBak);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getTagList(-1, lastList.size());
-                                    adapter.setImageList(imageUrlList, lastList.size());
-                                }
-                            });
-                        }
-                    } catch (MyNetworkException e) {
-                        lastList = new ArrayList<>(currentList);
-                        currentList = new ArrayList<>(nextList);
-                        nextList = new ArrayList<>(nextListBak);
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
-        threadPermit = true;
-    }
-
-    private void getNextData() {
+    private void getNextData(){
         if (threadPermit) {
+            Log.d("TAG", "getNextData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -232,7 +194,7 @@ public class ComicImageVertical extends AppCompatActivity{
                                 @Override
                                 public void run() {
                                     getTagList(1,nextList.size());
-                                    adapter.setImageList(imageUrlList, -lastListBak.size());
+                                    adapter.setImageUrlList(imageUrlList,true, lastListBak.size());
                                 }
                             });
                         }
@@ -240,33 +202,6 @@ public class ComicImageVertical extends AppCompatActivity{
                         nextList = new ArrayList<>(currentList);
                         currentList = new ArrayList<>(lastList);
                         lastList = new ArrayList<>(lastListBak);
-                    }
-                }
-            }).start();
-        }
-        threadPermit = true;
-    }
-
-    private void getInitLastData() {
-        if (episodePosition > 0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Sites sites = Sites.getSites(book.getWebsite());
-                        if (sites != null) {
-                            lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
-                            imageUrlList.addAll(0, lastList);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getTagList(-1, lastList.size());
-                                    adapter.setImageList(imageUrlList, lastList.size());
-                                }
-                            });
-                        }
-                    } catch (MyNetworkException e) {
-                        e.printStackTrace();
                     }
                 }
             }).start();
@@ -283,26 +218,146 @@ public class ComicImageVertical extends AppCompatActivity{
                         Sites sites = Sites.getSites(book.getWebsite());
                         if (sites != null) {
                             nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                            imageUrlList.addAll(nextList);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    imageUrlList.addAll(nextList);
                                     getTagList(1, nextList.size());
-                                    adapter.setImageList(imageUrlList, 0);
-                                    getInitLastData();
+                                    adapter.setImageUrlList(imageUrlList, true,0);
                                 }
                             });
                         }
                     } catch (MyNetworkException e) {
                         e.printStackTrace();
-                        threadPermit = true;
                     }
                 }
             }).start();
         }
+        threadPermit = true;
     }
 
-    //key接收 -1 Last;0 Current +1 Next
+    private void getLastData(){
+        Log.d("TAG", "getLastData: ");
+        if (refreshLayout.isRefreshing()){
+            refreshLayout.setRefreshing(false);
+        }
+    }
+
+    /*private void getNextData(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean flag = true;
+                int i=0;
+                nextPage += 1;
+                final List<String> newList = new ArrayList<>();
+                for (int j=0;j<CONTAINER_THRESHOLD;j++) {
+                    tagList.remove(0);
+                }
+                for (int j=nextPage;j<image_url.size();j++,i++){
+                    newList.add(image_url.get(j));
+                    tagList.add(episodePosition + "#" + j +"#"+ image_url.size());
+                    if (i >= CONTAINER_THRESHOLD-1){
+                        nextPage = j;
+                        flag = false;
+                        break;
+                    }
+                }
+                if(flag) {
+                    Sites sites = Sites.getSites(book.getWebsite());
+                    episodePosition += 1;
+                    label:
+                    while (true) {
+                        try {
+                            image_url = sites.getImage(episodeList.get(episodePosition).getId());
+                            for (int j = 0; j < image_url.size(); j++, i++) {
+                                tagList.add(episodePosition + "#" + j +"#"+ image_url.size());
+                                newList.add(image_url.get(j));
+                                if (i >= CONTAINER_THRESHOLD - 1) {
+                                    nextPage = j;
+                                    break label;
+                                }
+                            }
+                            episodePosition += 1;
+                        } catch (MyNetworkException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.updateList(newList,true,CONTAINER_THRESHOLD);
+                        String[] arr = tagList.get(0).split("#");
+                        lastChapter = Integer.parseInt(arr[0]);
+                        lastPage = Integer.parseInt(arr[1]);
+                        threadPermit = true;
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void getLastData(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean flag = true;
+                int i = 0;
+                lastPage -= 1;
+                final List<String> newList = new ArrayList<>();
+                for (int j = 0; j < CONTAINER_THRESHOLD; j++) {
+                    tagList.remove(tagList.size() - 1);
+                }
+                for (int j = lastPage; j >= 0; j--, i++) {
+                    newList.add(0, image_url.get(j));
+                    tagList.add(0,lastChapter + "#" + j +"#"+ image_url.size());
+                    if (i >= CONTAINER_THRESHOLD - 1) {
+                        lastPage = j;
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    Sites sites = Sites.getSites(book.getWebsite());
+                    lastChapter -= 1;
+                    label:
+                    while (true) {
+                        try {
+                            image_url = sites.getImage(episodeList.get(lastChapter).getId());
+                            for (int j = image_url.size() - 1; j >= 0; j--, i++) {
+                                tagList.add(0,lastChapter + "#" + j +"#"+ image_url.size());
+                                newList.add(image_url.get(j));
+                                if (i >= CONTAINER_THRESHOLD - 1) {
+                                    lastPage = j;
+                                    break label;
+                                }
+                            }
+                            lastChapter -= 1;
+                        } catch (MyNetworkException e) {
+                            image_url = new ArrayList<>();
+                            MyError.show(ComicImageVertical.this,MyError.MyNetworkException);
+                            break;
+                        }
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.updateList(newList, false, CONTAINER_THRESHOLD);
+                        String[] arr = tagList.get(tagList.size() - 1).split("#");
+                        episodePosition = Integer.parseInt(arr[0]);
+                        nextPage = Integer.parseInt(arr[1]);
+                        manager.scrollToPositionWithOffset(CONTAINER_THRESHOLD,1);
+                        if (refreshLayout.isRefreshing()){
+                            refreshLayout.setRefreshing(false);
+                        }
+                    }
+                });
+            }
+        }).start();
+    }*/
+
     private void getTagList(final int key,int size){
         List<Integer> list;
         for (int i=0;i<size;i++){
@@ -321,5 +376,6 @@ public class ComicImageVertical extends AppCompatActivity{
                 }
             }
         }
+        Logger.d(tagList);
     }
 }

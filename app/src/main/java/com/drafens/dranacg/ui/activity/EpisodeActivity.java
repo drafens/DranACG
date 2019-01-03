@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +12,13 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.drafens.dranacg.Book;
@@ -32,12 +37,13 @@ import com.drafens.dranacg.ui.adapter.EpisodeAdapter;
 import java.io.Serializable;
 import java.util.List;
 
-public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener {
+public class EpisodeActivity extends AppCompatActivity implements View.OnClickListener, Toolbar.OnMenuItemClickListener,RadioGroup.OnCheckedChangeListener {
     private RecyclerView recyclerView;
     private TextView textNonEpisode;
     private FloatingActionButton fabFavourite;
     private FloatingActionButton fabLastRead;
     private EpisodeAdapter adapter;
+    private BottomSheetDialog bottomSheetDialog;
 
     private Book book;
     private List<Episode> episodeList;
@@ -63,12 +69,24 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
         toolbar.setTitle(book.getName());
         ImageManager.setBackground(EpisodeActivity.this,book.getIcon(), appBarLayout);
         setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(this);
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayout.VERTICAL);
         recyclerView.setLayoutManager(manager);
         setEpisodeList();
         setFab();
+    }
+
+    private void showDialog(){
+        RadioGroup radioGroup;
+        bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.dialog_setting);
+        radioGroup = bottomSheetDialog.findViewById(R.id.radio_group);
+        if (radioGroup != null) {
+            radioGroup.setOnCheckedChangeListener(this);
+            bottomSheetDialog.show();
+        }
     }
 
     private void setFab() {
@@ -133,6 +151,30 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_episode, menu);
         return true;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.action_settings:
+                showDialog();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId){
+            case R.id.radio_horizon:
+                book.setReadMode(Book.HORIZON);
+                bottomSheetDialog.hide();
+                break;
+            case R.id.radio_vertical:
+                book.setReadMode(Book.VERTICAL);
+                bottomSheetDialog.hide();
+                break;
+        }
     }
 
     @Override

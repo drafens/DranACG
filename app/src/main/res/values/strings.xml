@@ -21,4 +21,7 @@
     <string name="non_episode_result">没有章节</string>
     <string name="update_sign">更新标志</string>
     <string name="image_comic">漫画图片</string>
+    <string name="read_mode">阅读方式</string>
+    <string name="read_mode_horizon">翻页</string>
+    <string name="read_mode_vertical">卷轴</string>
 </resources>

@@ -9,19 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.drafens.dranacg.R;
 import com.drafens.dranacg.tools.ImageManager;
+import com.drafens.dranacg.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdapter.ViewHolder> {
     private Context context;
-    private List<String> imageList;
-    private int shiftSize;
+    private List<String> imageUrlList;
 
-    public ImageVerticalAdapter(Context context, List<String> imageList){
-        this.imageList = new ArrayList<>(imageList);
+    public ImageVerticalAdapter(Context context, List<String> imageUrlList){
+        this.imageUrlList = imageUrlList;
         this.context = context;
     }
 
@@ -34,12 +32,12 @@ public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdap
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        ImageManager.getImage(context, imageList.get(position), holder.image);
+        ImageManager.getImage(context, imageUrlList.get(position), holder.image);
     }
 
     @Override
     public int getItemCount() {
-        return imageList.size();
+        return imageUrlList.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
@@ -50,27 +48,12 @@ public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdap
         }
     }
 
-    @Override
-    public boolean onFailedToRecycleView(@NonNull ViewHolder holder) {
-        return false;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        Log.d("TAG", position+" "+super.getItemId(position));
-        return super.getItemId(position);
-    }
-
-    public void setImageList(List<String> imageList, int shiftSize) {
-        this.imageList = imageList;
-        this.shiftSize = shiftSize;
-        if (shiftSize > 0) {
-            notifyItemRangeRemoved(0,shiftSize);
-            //notifyItemRangeChanged(0,shiftSize);
-        }else if (shiftSize < 0){
+    public void setImageUrlList(List<String> imageUrlList,boolean isNext,int shiftSize) {
+        this.imageUrlList = imageUrlList;
+        if (isNext) {//Next
+            notifyItemRangeRemoved(0, shiftSize);
+        }else {
             notifyItemRangeInserted(0,shiftSize);
-            Log.d("TAG", "setImageList: "+shiftSize);
-            //notifyItemRangeChanged(0,imageList.size());
         }
     }
 }
