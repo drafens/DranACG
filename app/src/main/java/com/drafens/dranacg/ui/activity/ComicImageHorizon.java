@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -108,6 +109,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     @Override
     public void onPageSelected(int i) {
+        Log.d("TAG", "onPageSelected: "+i);
         adapterPosition = i;
         if (tagList.get(adapterPosition).get(0) > episodePosition) {
             episodePosition += 1;
@@ -160,6 +162,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     private void getLastData(){
         if(threadPermit) {
+            Log.d("TAG", "getLastData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -168,8 +171,8 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     try {
                         Sites sites = Sites.getSites(book.getWebsite());
                         if (sites != null) {
-                                nextList = new ArrayList<>(currentList);
-                                currentList = new ArrayList<>(lastList);
+                            nextList = new ArrayList<>(currentList);
+                            currentList = new ArrayList<>(lastList);
                             if(episodePosition>0) {
                                 lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
                                 imageUrlList.addAll(0, lastList);
@@ -181,6 +184,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                                 @Override
                                 public void run() {
                                     getTagList(-1, lastList.size());
+                                    Log.d("TAG", "overL");
                                     adapter.setImageList(imageUrlList, lastList.size());
                                 }
                             });
@@ -199,6 +203,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     private void getNextData() {
         if (threadPermit) {
+            Log.d("TAG", "getNextData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -220,6 +225,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                                 @Override
                                 public void run() {
                                     getTagList(1,nextList.size());
+                                    Log.d("TAG", "overN");
                                     adapter.setImageList(imageUrlList, -lastListBak.size());
                                 }
                             });

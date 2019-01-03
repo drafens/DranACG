@@ -101,10 +101,11 @@ public class ComicImageVertical extends AppCompatActivity{
     public void initView(){
         recyclerView = findViewById(R.id.recycler);
 
-
-        recyclerView.setFocusableInTouchMode(false);
         recyclerView.setFocusable(false);
-        recyclerView.setHasFixedSize(true);
+
+        /*recyclerView.setFocusableInTouchMode(false);
+        recyclerView.setFocusable(false);
+        recyclerView.setHasFixedSize(true);*/
 
 
         textDetail=findViewById(R.id.tv_detail);
@@ -261,8 +262,6 @@ public class ComicImageVertical extends AppCompatActivity{
                                 public void run() {
                                     getTagList(-1, lastList.size());
                                     adapter.setImageList(imageUrlList, lastList.size());
-                                    //manager.scrollToPositionWithOffset(10,1);
-
                                 }
                             });
                         }

@@ -57,7 +57,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
                             if (FavouriteManager.getReadModeDefault(context)==Book.VERTICAL){
                                 intent = new Intent(context, ComicImageVertical.class);
                             }else {
-                                intent = new Intent(context, ComicImageVertical.class);
+                                intent = new Intent(context, ComicImageHorizon.class);
                             }
                         }
                         intent.putExtra("episode",(Serializable) episodeList);

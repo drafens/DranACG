@@ -1,8 +1,12 @@
 package com.drafens.dranacg.ui.adapter;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +42,9 @@ public class ImageHorizonAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_image_horizon, container, false);
-        ImageView imageView = view.findViewById(R.id.iv_comic);
-        ImageManager.getImage(context,imageList.get(position),imageView);
         view.setTag(position);
+        ImageView imageView = view.findViewById(R.id.iv_comic);
+        ImageManager.getImage(context, imageList.get(position), imageView);
         container.addView(view);
         return view;
     }
@@ -55,7 +59,8 @@ public class ImageHorizonAdapter extends PagerAdapter {
     public int getItemPosition(@NonNull Object object) {
         View view = (View) object;
         int position = (int)view.getTag() + shiftSize;
-        if(position >= 0){
+        if(position>=0){
+            view.setTag(position);
             return position;
         }else {
             return POSITION_UNCHANGED;

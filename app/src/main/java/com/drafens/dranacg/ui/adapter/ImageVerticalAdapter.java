@@ -3,6 +3,7 @@ package com.drafens.dranacg.ui.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdapter.ViewHolder> {
     private Context context;
     private List<String> imageList;
+    private int shiftSize;
 
     public ImageVerticalAdapter(Context context, List<String> imageList){
         this.imageList = new ArrayList<>(imageList);
@@ -53,13 +55,21 @@ public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdap
         return false;
     }
 
+    @Override
+    public long getItemId(int position) {
+        Log.d("TAG", position+" "+super.getItemId(position));
+        return super.getItemId(position);
+    }
+
     public void setImageList(List<String> imageList, int shiftSize) {
         this.imageList = imageList;
+        this.shiftSize = shiftSize;
         if (shiftSize > 0) {
             notifyItemRangeRemoved(0,shiftSize);
             //notifyItemRangeChanged(0,shiftSize);
         }else if (shiftSize < 0){
             notifyItemRangeInserted(0,shiftSize);
+            Log.d("TAG", "setImageList: "+shiftSize);
             //notifyItemRangeChanged(0,imageList.size());
         }
     }
