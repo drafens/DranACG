@@ -1,6 +1,7 @@
 package com.drafens.dranacg.tools;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.orhanobut.logger.Logger;
@@ -28,5 +29,22 @@ public class MyDescription {
         }catch (Exception e){
             throw new MyJsoupResolveException();
         }
+    }
+
+    public static String evalArrayToString(String evalArray){
+        int begin = evalArray.indexOf("}('");
+        String header = evalArray.substring(0,begin+1);
+
+        String string = evalArray.substring(begin);
+        String[] strings = string.split(";");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i=0;i<strings.length-1;i++){
+            begin = strings[i].indexOf("=");
+            stringBuilder.append("\\'").append(strings[i].substring(begin + 2, strings[i].length() - 1)).append("\\',");
+        }
+        String evalString = stringBuilder.toString();
+
+        evalString = header+"('myEvalString=["+evalString.substring(0,evalString.length()-1)+"]"+strings[strings.length-1];
+        return evalString;
     }
 }

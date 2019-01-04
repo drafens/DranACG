@@ -107,6 +107,7 @@ public class Pufei extends Sites {
     @Override
     public List<String> getImage(String episode_id) throws MyNetworkException{
         String url = url_pufei + episode_id + ".html";
+        String header = "http://res.img.pufei.net/";
         List<String> urlList = new ArrayList<>();
         try {
             Document document = Jsoup.connect(url).get();
@@ -118,7 +119,7 @@ public class Pufei extends Sites {
             string = MyDescription.evalDecode(string);
             String[] arr = string.split(",");
             for (String anArr : arr) {
-                urlList.add("http://res.img.pufei.net/" + anArr);
+                urlList.add(header + anArr);
             }
         }catch (Exception e){
             e.printStackTrace();

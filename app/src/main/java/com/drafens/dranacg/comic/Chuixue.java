@@ -17,7 +17,6 @@ import org.jsoup.select.Elements;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -104,71 +103,49 @@ public class Chuixue extends Sites {
     @Override
     public List<String> getImage(String episode_id) throws MyNetworkException{
         String url = url_chuixue + episode_id.replace("mh","manhua") + ".html";
-        String[] strings;
+        Log.d("TAG", url);
+        String header1 = "http://2.huanleyunpai.com/";
+        String header2 = "http://img.huanleyunpai.com/";
         List<String> urlList = new ArrayList<>();
-        String[] replace_old = {"0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-        String string;
         try {
             Document document = Jsoup.connect(url).get();
             Elements elements = document.select("script[type=text/javascript]");
-            string = elements.toString();
+            String string = elements.toString();
+
+            int i = string.indexOf("lyhzh");
+            String headerMark = string.substring(i+7,string.indexOf(",",i)-1);
+            Log.d("TAG", headerMark);
+            String header;
+            if (headerMark.equals("zjwb")){
+                header = header1;
+            }else {
+                header = header2;
+            }
             if (!string.contains("photosr[1]")){
                 int begin = string.indexOf("packed=\"")+8;
                 string=string.substring(begin,string.indexOf("\"",begin));
                 string = MyDescription.base64Decode(string);
-
-
-                //s = MyDescription.evalDecode("var photosr = new Array();"+s);
-
-
-                string=string.substring(string.indexOf("}('")+3,string.indexOf("split")-2);
-                int index=string.indexOf("'");
-                String s1=string.substring(0,index-1);
-                String s2=string.substring(string.indexOf("'",index+1)+1);
-                String[] s1_a=s1.split(";");
-                String[] s2_arr=s2.split("\\|");
-                String[][] s2_a=new String[s2_arr.length/62+1][62];
-                for (int i = 0; i < s1_a.length; i++) {
-                    s1_a[i] = "/"+s1_a[i].substring(s1_a[i].indexOf("\"") + 1, s1_a[i].indexOf("."))+"/";
+                string = MyDescription.evalArrayToString(string);
+                string = MyDescription.evalDecode(string);
+                String[] arr = string.split(",");
+                for (String anArr : arr) {
+                    urlList.add(header + anArr);
                 }
-                for (int i=0;i<s2_a.length;i++){
-                    for(int j=0;j<62&&j<s2_arr.length-i*62;j++){
-                        s2_a[i][j]=s2_arr[i*62+j];
-                    }
-                }
-                String t_value;
-                strings=new String[s1_a.length];
-                for (int t=0;t<s2_a.length;t++){
-                    if(t==0) {
-                        t_value="";
-                    }else {
-                        t_value= String.valueOf(t);
-                    }
-                    for (int i=0;i<s1_a.length;i++){
-                        for (int j=0;j<62;j++) {
-                            if (s2_a[t][j] != null && !(s2_a[t][j].equals(""))) {
-                                s1_a[i] = s1_a[i].replace("/" + t_value + replace_old[j] + "/", "/" + s2_a[t][j] + "/");
-                                s1_a[i] = s1_a[i].replace("/" + t_value + replace_old[j] + "/", "/" + s2_a[t][j] + "/");
-                                strings[i] = "http://img.fengjingjituan.com/" + s1_a[i].substring(1, s1_a[i].length() - 1) + ".jpg";
-                            }
-                        }
-                    }
-                }
-                urlList.addAll(Arrays.asList(strings).subList(0, s1_a.length));
             }else {
                 int begin = string.indexOf("photosr[1]") + 7;
                 int end = string.indexOf("var", begin);
-                strings = string.substring(begin, end).split("photosr");
-                for (String string1 : strings) {
-                    begin = string1.indexOf("\"") + 1;
-                    end = string1.indexOf("\"", begin);
-                    urlList.add("http://img.fengjingjituan.com/" + string1.substring(begin, end));
+                String[] arr = string.substring(begin, end).split("photosr");
+                for (String anArr : arr) {
+                    begin = anArr.indexOf("\"") + 1;
+                    end = anArr.indexOf("\"", begin);
+                    urlList.add(header + anArr.substring(begin, end));
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
             throw new MyNetworkException();
         }
+        com.orhanobut.logger.Logger.d(urlList);
         return urlList;
     }
 }
