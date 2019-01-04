@@ -60,7 +60,7 @@ public class Gufeng extends Sites {
             Elements elements = document.select("div[class=comic-view clearfix]");
             book.setUpdateChapter(elements.select("dl[class=pic_zi fs15]").get(0).select("dd").text());
             book.setUpdateTime(elements.select("dl[class=pic_zi fs15]").get(3).select("dd").text());
-            book.setLastReadChapter_id(elements.select("a[id=Subscribe_bak]").attr("href").replace(".html",""));
+            book.setUpdateChapter_id(elements.select("a[id=Subscribe_bak]").attr("href").replace(".html",""));
             book.setBriefInfo(elements.select("p[class=txtDesc autoHeight]").text());
         }catch (Exception e){
             e.printStackTrace();
