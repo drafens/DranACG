@@ -1,13 +1,20 @@
 apply plugin: 'com.android.application'
 
+static def releaseTime() {
+    return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+8"))
+}
+
+def version = "1.2_" + releaseTime()
+def gitCommits = Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+
 android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.drafens.dranacg"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode gitCommits
+        versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -33,10 +40,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    //Jsoup
     implementation 'org.jsoup:jsoup:1.11.2'
+    //okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //Glide
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
-
+    //JavaScript
+    implementation 'io.apisense:rhino-android:1.0'
+    //log
     implementation 'com.orhanobut:logger:1.15'
 }

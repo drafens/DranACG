@@ -6,8 +6,11 @@ import android.util.Log;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.Sites;
+import com.drafens.dranacg.error.MyJsonFormatException;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.error.MyNetworkException;
+import com.drafens.dranacg.tools.MyDescription;
+import com.orhanobut.logger.Logger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 
 public class Pufei extends Sites {
     private static String url_pufei = "http://m.pufei.net";
@@ -101,53 +105,21 @@ public class Pufei extends Sites {
     }
 
     @Override
-    public List<String> getImage(String episode_id) throws MyNetworkException {
+    public List<String> getImage(String episode_id) throws MyNetworkException{
         String url = url_pufei + episode_id + ".html";
-        String[] strings;
-        List<String> urlList;
-        String[] replace_old = {"0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-        String string;
+        List<String> urlList = new ArrayList<>();
         try {
             Document document = Jsoup.connect(url).get();
             Element element = document.select("script[type=text/javascript]").get(5);
-            string = element.toString();
+            String string = element.toString();
             int begin = string.indexOf("cp=\"")+4;
             string=string.substring(begin,string.indexOf("\"",begin));
-            string = new String(Base64.decode(string.getBytes(),Base64.DEFAULT));
-            string=string.substring(string.indexOf("}('")+3,string.indexOf("split")-2);
-            int index=string.indexOf("]");
-            String s1=string.substring(string.indexOf("[")+3,index-2).replace("\\'","");
-            String s2=string.substring(string.indexOf("'",index+2)+1);
-            String[] s1_a=s1.split(",");
-            String[] s2_arr=s2.split("\\|");
-            String[][] s2_a=new String[s2_arr.length/62+1][62];
-            for (int i = 0; i < s1_a.length; i++) {
-                s1_a[i] = "/"+s1_a[i].replace(".","/./")+"/";
+            string = MyDescription.base64Decode(string);
+            string = MyDescription.evalDecode(string);
+            String[] arr = string.split(",");
+            for (String anArr : arr) {
+                urlList.add("http://res.img.pufei.net/" + anArr);
             }
-            for (int i=0;i<s2_a.length;i++){
-                for(int j=0;j<62&&j<s2_arr.length-i*62;j++){
-                    s2_a[i][j]=s2_arr[i*62+j];
-                }
-            }
-            strings = new String[s1_a.length];
-            String t_value;
-            for (int t=0;t<s2_a.length;t++){
-                if(t==0) {
-                    t_value="";
-                }else {
-                    t_value= String.valueOf(t);
-                }
-                for (int i=0;i<s1_a.length;i++){
-                    for (int j=0;j<62;j++) {
-                        if (s2_a[t][j] != null && !(s2_a[t][j].equals(""))) {
-                            s1_a[i] = s1_a[i].replace("/" + t_value + replace_old[j] + "/", "/" + s2_a[t][j] + "/");
-                            s1_a[i] = s1_a[i].replace("/" + t_value + replace_old[j] + "/", "/" + s2_a[t][j] + "/");
-                            strings[i] = "http://res.img.pufei.net/" + s1_a[i].substring(1, s1_a[i].length() - 1).replace("/./",".");
-                        }
-                    }
-                }
-            }
-            urlList = new ArrayList<>(Arrays.asList(strings).subList(0, s1_a.length));
         }catch (Exception e){
             e.printStackTrace();
             throw new MyNetworkException();

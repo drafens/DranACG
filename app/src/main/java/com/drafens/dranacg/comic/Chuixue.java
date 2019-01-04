@@ -1,12 +1,14 @@
 package com.drafens.dranacg.comic;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.Sites;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.error.MyNetworkException;
+import com.drafens.dranacg.tools.MyDescription;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -113,7 +115,12 @@ public class Chuixue extends Sites {
             if (!string.contains("photosr[1]")){
                 int begin = string.indexOf("packed=\"")+8;
                 string=string.substring(begin,string.indexOf("\"",begin));
-                string = new String(Base64.decode(string.getBytes(),Base64.DEFAULT));
+                string = MyDescription.base64Decode(string);
+
+
+                //s = MyDescription.evalDecode("var photosr = new Array();"+s);
+
+
                 string=string.substring(string.indexOf("}('")+3,string.indexOf("split")-2);
                 int index=string.indexOf("'");
                 String s1=string.substring(0,index-1);
