@@ -44,7 +44,8 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     private ImageHorizonAdapter adapter;
 
     private boolean threadPermit = false;
-
+    private int lastPageScrollState;
+    private int currentPageScrollState = 0;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -104,26 +105,37 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     @Override
     public void onPageScrolled(int i, float v, int i1) {
-
     }
 
     @Override
     public void onPageSelected(int i) {
-        Log.d("TAG", "onPageSelected: "+i);
-        adapterPosition = i;
-        if (tagList.get(adapterPosition).get(0) == episodePosition+1) {
-            episodePosition += 1;
-            getNextData();
-        } else if (tagList.get(adapterPosition).get(0) == episodePosition-1) {
-            episodePosition -= 1;
+        if (i>=0 && i<tagList.size()) {
+            adapterPosition = i;
+            if (tagList.get(adapterPosition).get(0) == episodePosition+1) {
+                episodePosition += 1;
+            } else if (tagList.get(adapterPosition).get(0) == episodePosition-1) {
+                episodePosition -= 1;
+            }
+        }
+        if (tagList.get(0).get(0)==episodePosition && episodePosition>0){
             getLastData();
+        } else if (tagList.get(tagList.size()-1).get(0)==episodePosition && episodePosition<episodeList.size()-1){
+            getNextData();
         }
         setDetailText();
     }
 
     @Override
     public void onPageScrollStateChanged(int i) {
-
+        lastPageScrollState = currentPageScrollState;
+        currentPageScrollState = i;
+        if (lastPageScrollState==1 && currentPageScrollState==0){
+            if (tagList.get(0).get(0)==episodePosition && episodePosition>0){
+                getLastData();
+            } else if (tagList.get(tagList.size()-1).get(0)==episodePosition && episodePosition<episodeList.size()-1){
+                getNextData();
+            }
+        }
     }
 
     private void getInitCurrentData(){
@@ -150,7 +162,10 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         lastList = new ArrayList<>();
                         nextList = new ArrayList<>();
                         adapter = new ImageHorizonAdapter(ComicImageHorizon.this,imageUrlList);
-                        getTagList(0,currentList.size());
+                        for (int i=0;i<currentList.size();i++){
+                            List<Integer> list = Arrays.asList(episodePosition,i,currentList.size());
+                            tagList.add(list);
+                        }
                         viewPager.setAdapter(adapter);
                         setDetailText();
                         getInitNextData();
@@ -162,7 +177,6 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     private void getLastData(){
         if(threadPermit) {
-            Log.d("TAG", "getLastData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -174,7 +188,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             nextList = new ArrayList<>(currentList);
                             currentList = new ArrayList<>(lastList);
                             if(episodePosition>0) {
-                                lastList = sites.getImage(episodeList.get(episodePosition - 1).getId());
+                                lastList = sites.getImage(episodeList.get(tagList.get(0).get(0) - 1).getId());
                                 imageUrlList.addAll(0, lastList);
                             }else {
                                 lastList = new ArrayList<>();
@@ -183,9 +197,9 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getTagList(-1, lastList.size());
-                                    Log.d("TAG", "overL");
+                                    getTagList(false,true);
                                     adapter.setImageList(imageUrlList, lastList.size());
+                                    threadPermit = true;
                                 }
                             });
                         }
@@ -193,17 +207,15 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         lastList = new ArrayList<>(currentList);
                         currentList = new ArrayList<>(nextList);
                         nextList = new ArrayList<>(nextListBak);
-                        e.printStackTrace();
+                        threadPermit = true;
                     }
                 }
             }).start();
         }
-        threadPermit = true;
     }
 
     private void getNextData() {
         if (threadPermit) {
-            Log.d("TAG", "getNextData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -224,9 +236,9 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getTagList(1,nextList.size());
-                                    Log.d("TAG", "overN");
+                                    getTagList(true,true);
                                     adapter.setImageList(imageUrlList, -lastListBak.size());
+                                    threadPermit = true;
                                 }
                             });
                         }
@@ -234,11 +246,11 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                         nextList = new ArrayList<>(currentList);
                         currentList = new ArrayList<>(lastList);
                         lastList = new ArrayList<>(lastListBak);
+                        threadPermit = true;
                     }
                 }
             }).start();
         }
-        threadPermit = true;
     }
 
     private void getInitLastData() {
@@ -254,18 +266,21 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getTagList(-1, lastList.size());
+                                    getTagList(false,false);
                                     adapter.setImageList(imageUrlList, lastList.size());
+                                    threadPermit = true;
                                 }
                             });
                         }
                     } catch (MyNetworkException e) {
                         e.printStackTrace();
+                        threadPermit = true;
                     }
                 }
             }).start();
+        }else {
+            threadPermit = true;
         }
-        threadPermit = true;
     }
 
     private void getInitNextData(){
@@ -281,7 +296,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getTagList(1, nextList.size());
+                                    getTagList(true,false);
                                     adapter.setImageList(imageUrlList, 0);
                                     getInitLastData();
                                 }
@@ -293,25 +308,39 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                     }
                 }
             }).start();
+        }else {
+            getInitLastData();
         }
     }
 
-    //key接收 -1 Last;0 Current +1 Next
-    private void getTagList(final int key,int size){
+    private void getTagList(boolean isNext,boolean needRemove){
         List<Integer> list;
-        for (int i=0;i<size;i++){
-            list = Arrays.asList(episodePosition + key,i,size);
-            if (key == -1) {
-                tagList.add(i, list);
-            }else if (key == 1 || key == 0){
+        int episodeNextPosition = tagList.get(tagList.size()-1).get(0);
+        int episodeLastPosition = tagList.get(0).get(0);
+        if (isNext){
+            for (int i=0;i<nextList.size();i++){
+                list = Arrays.asList(episodeNextPosition+1,i,nextList.size());
                 tagList.add(list);
             }
-        }
-        if (key == 1 || key ==-1) {
-            for (int i = 0; i < tagList.size(); i++) {
-                if (tagList.get(i).get(0) == (episodePosition - key - key)) {
-                    tagList.remove(i);
-                    i--;
+            if (needRemove) {
+                for (int i = 0; i < tagList.size(); i++) {
+                    if (tagList.get(i).get(0) == episodeLastPosition) {
+                        tagList.remove(i);
+                        i--;
+                    }
+                }
+            }
+        }else {
+            for (int i=0;i<lastList.size();i++){
+                list = Arrays.asList(episodeLastPosition-1,i,lastList.size());
+                tagList.add(i,list);
+            }
+            if (needRemove) {
+                for (int i = 0; i < tagList.size(); i++) {
+                    if (tagList.get(i).get(0) == episodeNextPosition) {
+                        tagList.remove(i);
+                        i--;
+                    }
                 }
             }
         }
