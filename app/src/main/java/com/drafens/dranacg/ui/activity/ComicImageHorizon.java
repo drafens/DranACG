@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,6 +22,7 @@ import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +45,6 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
     private ImageHorizonAdapter adapter;
 
     private boolean threadPermit = false;
-    private int lastPageScrollState;
     private int currentPageScrollState = 0;
 
     @SuppressWarnings("unchecked")
@@ -126,9 +127,9 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     @Override
     public void onPageScrollStateChanged(int i) {
-        lastPageScrollState = currentPageScrollState;
+        int lastPageScrollState = currentPageScrollState;
         currentPageScrollState = i;
-        if (lastPageScrollState==1 && currentPageScrollState==0){
+        if (lastPageScrollState ==1 && currentPageScrollState==0){
             if (tagList.get(0).get(0)==episodePosition && episodePosition>0){
                 getLastData();
             } else if (tagList.get(tagList.size()-1).get(0)==episodePosition && episodePosition<episodeList.size()-1){
@@ -176,6 +177,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     private void getLastData(){
         if(threadPermit) {
+            Log.d("TAG", "getLastData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -215,6 +217,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
 
     private void getNextData() {
         if (threadPermit) {
+            Log.d("TAG", "getNextData: ");
             threadPermit = false;
             new Thread(new Runnable() {
                 @Override
@@ -321,7 +324,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                 list = Arrays.asList(episodeNextPosition+1,i,nextList.size());
                 tagList.add(list);
             }
-            if (needRemove) {
+            if (needRemove && episodePosition>1) {
                 for (int i = 0; i < tagList.size(); i++) {
                     if (tagList.get(i).get(0) == episodeLastPosition) {
                         tagList.remove(i);
@@ -334,7 +337,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                 list = Arrays.asList(episodeLastPosition-1,i,lastList.size());
                 tagList.add(i,list);
             }
-            if (needRemove) {
+            if (needRemove && episodePosition<episodeList.size()-2) {
                 for (int i = 0; i < tagList.size(); i++) {
                     if (tagList.get(i).get(0) == episodeNextPosition) {
                         tagList.remove(i);
@@ -343,5 +346,6 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                 }
             }
         }
+        Logger.d(tagList);
     }
 }

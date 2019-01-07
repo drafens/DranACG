@@ -103,7 +103,6 @@ public class Chuixue extends Sites {
     @Override
     public List<String> getImage(String episode_id) throws MyNetworkException{
         String url = url_chuixue + episode_id.replace("mh","manhua") + ".html";
-        Log.d("TAG", url);
         String header1 = "http://2.huanleyunpai.com/";
         String header2 = "http://img.huanleyunpai.com/";
         List<String> urlList = new ArrayList<>();
