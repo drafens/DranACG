@@ -26,7 +26,6 @@ import com.drafens.dranacg.error.MyError;
 import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.R;
 import com.drafens.dranacg.Sites;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,9 +36,7 @@ public class ComicImageVertical extends AppCompatActivity{
     private Book book;
     private List<Episode> episodeList;
     private List<String> imageUrlList;
-    private List<String> nextList;
-    private List<String> currentList;
-    private List<String> lastList;
+    private List<String> newList;
     private List<List<Integer>> tagList = new ArrayList<>();
     private int episodePosition;
     private int adapterPosition = 0;
@@ -117,11 +114,12 @@ public class ComicImageVertical extends AppCompatActivity{
                 super.onScrolled(recyclerView, dx, dy);
                 int i = manager.findFirstVisibleItemPosition();
                 int j = manager.findLastVisibleItemPosition();
-                if(i>=0) {
+                Log.d("TAG", i+"*"+j);
+                if(i>=0 && i<tagList.size()) {
                     adapterPosition = i;
                     setDetailText();
                 }
-                if (j>0) {
+                if (j>=0 && j<tagList.size()) {
                     if (tagList.get(j).get(0) == episodePosition+1) {
                         episodePosition += 1;
                         getNextData();
@@ -142,9 +140,9 @@ public class ComicImageVertical extends AppCompatActivity{
             public void run() {
                 try {
                     Sites sites = Sites.getSites(book.getWebsite());
-                    currentList = sites != null ? sites.getImage(episodeList.get(episodePosition).getId()) : new ArrayList<String>();
+                    imageUrlList = sites != null ? sites.getImage(episodeList.get(episodePosition).getId()) : new ArrayList<String>();
                 } catch (MyNetworkException e) {
-                    currentList = new ArrayList<>();
+                    imageUrlList = new ArrayList<>();
                     threadPermit = true;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -156,14 +154,15 @@ public class ComicImageVertical extends AppCompatActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        lastList = new ArrayList<>();
-                        nextList = new ArrayList<>();
-                        imageUrlList = new ArrayList<>(currentList);
-                        getTagList(0, imageUrlList.size());
+                        for (int i=0;i<imageUrlList.size();i++){
+                            List<Integer> list = Arrays.asList(episodePosition,i,imageUrlList.size());
+                            tagList.add(list);
+                        }
                         adapter = new ImageVerticalAdapter(ComicImageVertical.this, imageUrlList);
                         recyclerView.setAdapter(adapter);
                         setDetailText();
-                        getInitNextData();
+                        threadPermit = true;
+                        getNextData();
                     }
                 });
             }
@@ -177,58 +176,24 @@ public class ComicImageVertical extends AppCompatActivity{
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    final List<String> lastListBak = new ArrayList<>(lastList);
                     try {
                         Sites sites = Sites.getSites(book.getWebsite());
                         if (sites != null) {
-                            lastList = new ArrayList<>(currentList);
-                            currentList = new ArrayList<>(nextList);
                             if (episodePosition < episodeList.size() - 1) {
-                                nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                                imageUrlList.addAll(nextList);
+                                newList = sites.getImage(episodeList.get(episodePosition + 1).getId());
                             }else {
-                                nextList = new ArrayList<>();
+                                newList = new ArrayList<>();
                             }
-                            imageUrlList.removeAll(lastListBak);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    getTagList(1,nextList.size());
-                                    adapter.setImageUrlList(imageUrlList,true, lastListBak.size());
+                                    getTagList(true);
+                                    adapter.setImageUrlList(newList,true);
                                 }
                             });
                         }
                     } catch (MyNetworkException e) {
-                        nextList = new ArrayList<>(currentList);
-                        currentList = new ArrayList<>(lastList);
-                        lastList = new ArrayList<>(lastListBak);
-                    }
-                }
-            }).start();
-        }
-        threadPermit = true;
-    }
-
-    private void getInitNextData(){
-        if (episodePosition < episodeList.size()-1) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Sites sites = Sites.getSites(book.getWebsite());
-                        if (sites != null) {
-                            nextList = sites.getImage(episodeList.get(episodePosition + 1).getId());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    imageUrlList.addAll(nextList);
-                                    getTagList(1, nextList.size());
-                                    adapter.setImageUrlList(imageUrlList, true,0);
-                                }
-                            });
-                        }
-                    } catch (MyNetworkException e) {
-                        e.printStackTrace();
+                        newList = new ArrayList<>();
                     }
                 }
             }).start();
@@ -243,139 +208,22 @@ public class ComicImageVertical extends AppCompatActivity{
         }
     }
 
-    /*private void getNextData(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean flag = true;
-                int i=0;
-                nextPage += 1;
-                final List<String> newList = new ArrayList<>();
-                for (int j=0;j<CONTAINER_THRESHOLD;j++) {
-                    tagList.remove(0);
-                }
-                for (int j=nextPage;j<image_url.size();j++,i++){
-                    newList.add(image_url.get(j));
-                    tagList.add(episodePosition + "#" + j +"#"+ image_url.size());
-                    if (i >= CONTAINER_THRESHOLD-1){
-                        nextPage = j;
-                        flag = false;
-                        break;
-                    }
-                }
-                if(flag) {
-                    Sites sites = Sites.getSites(book.getWebsite());
-                    episodePosition += 1;
-                    label:
-                    while (true) {
-                        try {
-                            image_url = sites.getImage(episodeList.get(episodePosition).getId());
-                            for (int j = 0; j < image_url.size(); j++, i++) {
-                                tagList.add(episodePosition + "#" + j +"#"+ image_url.size());
-                                newList.add(image_url.get(j));
-                                if (i >= CONTAINER_THRESHOLD - 1) {
-                                    nextPage = j;
-                                    break label;
-                                }
-                            }
-                            episodePosition += 1;
-                        } catch (MyNetworkException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.updateList(newList,true,CONTAINER_THRESHOLD);
-                        String[] arr = tagList.get(0).split("#");
-                        lastChapter = Integer.parseInt(arr[0]);
-                        lastPage = Integer.parseInt(arr[1]);
-                        threadPermit = true;
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void getLastData(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean flag = true;
-                int i = 0;
-                lastPage -= 1;
-                final List<String> newList = new ArrayList<>();
-                for (int j = 0; j < CONTAINER_THRESHOLD; j++) {
-                    tagList.remove(tagList.size() - 1);
-                }
-                for (int j = lastPage; j >= 0; j--, i++) {
-                    newList.add(0, image_url.get(j));
-                    tagList.add(0,lastChapter + "#" + j +"#"+ image_url.size());
-                    if (i >= CONTAINER_THRESHOLD - 1) {
-                        lastPage = j;
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag) {
-                    Sites sites = Sites.getSites(book.getWebsite());
-                    lastChapter -= 1;
-                    label:
-                    while (true) {
-                        try {
-                            image_url = sites.getImage(episodeList.get(lastChapter).getId());
-                            for (int j = image_url.size() - 1; j >= 0; j--, i++) {
-                                tagList.add(0,lastChapter + "#" + j +"#"+ image_url.size());
-                                newList.add(image_url.get(j));
-                                if (i >= CONTAINER_THRESHOLD - 1) {
-                                    lastPage = j;
-                                    break label;
-                                }
-                            }
-                            lastChapter -= 1;
-                        } catch (MyNetworkException e) {
-                            image_url = new ArrayList<>();
-                            MyError.show(ComicImageVertical.this,MyError.MyNetworkException);
-                            break;
-                        }
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.updateList(newList, false, CONTAINER_THRESHOLD);
-                        String[] arr = tagList.get(tagList.size() - 1).split("#");
-                        episodePosition = Integer.parseInt(arr[0]);
-                        nextPage = Integer.parseInt(arr[1]);
-                        manager.scrollToPositionWithOffset(CONTAINER_THRESHOLD,1);
-                        if (refreshLayout.isRefreshing()){
-                            refreshLayout.setRefreshing(false);
-                        }
-                    }
-                });
-            }
-        }).start();
-    }*/
-
-    private void getTagList(final int key,int size){
+    private void getTagList(boolean isNext){
         List<Integer> list;
-        for (int i=0;i<size;i++){
-            list = Arrays.asList(episodePosition + key,i,size);
-            if (key == -1) {
-                tagList.add(i, list);
-            }else if (key == 1 || key == 0){
+        int episodeNextPosition = tagList.get(tagList.size()-1).get(0);
+        int episodeLastPosition = tagList.get(0).get(0);
+        if (isNext){
+            imageUrlList.addAll(newList);
+            for (int i=0;i<newList.size();i++){
+                list = Arrays.asList(episodeNextPosition+1,i,newList.size());
                 tagList.add(list);
             }
-        }
-        if (key == 1 || key ==-1) {
-            for (int i = 0; i < tagList.size(); i++) {
-                if (tagList.get(i).get(0) == (episodePosition - key - key)) {
-                    tagList.remove(i);
-                    i--;
-                }
+        }else {
+            imageUrlList.addAll(0,newList);
+            for (int i=0;i<newList.size();i++){
+                list = Arrays.asList(episodeLastPosition-1,i,newList.size());
+                tagList.add(i,list);
             }
         }
-        Logger.d(tagList);
     }
 }

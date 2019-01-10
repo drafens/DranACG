@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FavouriteManager {
+    //外部储存
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/drafens/";
 
     public static void add_favourite(Book book, int searchItem) throws MyFileWriteException, MyJsonFormatException {

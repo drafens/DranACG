@@ -22,7 +22,6 @@ import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.FavouriteManager;
 import com.drafens.dranacg.tools.Tools;
 import com.drafens.dranacg.ui.adapter.ImageHorizonAdapter;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -346,6 +345,5 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
                 }
             }
         }
-        Logger.d(tagList);
     }
 }

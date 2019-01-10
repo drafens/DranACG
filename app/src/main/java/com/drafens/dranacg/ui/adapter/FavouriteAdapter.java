@@ -60,7 +60,7 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         holder.type.setText(book.getType());
         holder.lastReadChapter.setText(book.getLastReadChapter());
         holder.lastReadTime.setText(book.getLastReadTime());
-        ImageManager.getIcon(context,book.getIcon(),holder.icon);
+        ImageManager.getIcon(book.getIcon(),holder.icon);
         if (position<updateSize){
             holder.iv_update.setVisibility(View.VISIBLE);
         }else {

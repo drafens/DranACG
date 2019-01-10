@@ -51,7 +51,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         holder.updateTime.setText(book.getUpdateTime());
         holder.author.setText(book.getAuthor());
         holder.type.setText(book.getType());
-        ImageManager.getIcon(context,book.getIcon(),holder.icon);
+        ImageManager.getIcon(book.getIcon(),holder.icon);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
