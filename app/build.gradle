@@ -35,7 +35,7 @@ configurations.all {
         def requested = details.requested
         if (requested.group == 'com.android.support') {
             if (!requested.name.startsWith("multidex")) {
-                details.useVersion '28.0.0'
+                details.useVersion '27.1.0'
             }
         }
     }
@@ -61,4 +61,6 @@ dependencies {
     implementation 'io.apisense:rhino-android:1.0'
     //log
     implementation 'com.orhanobut:logger:1.15'
+    //webdav
+    implementation 'org.apache.jackrabbit:jackrabbit-webdav:2.10.1'
 }

@@ -21,17 +21,23 @@ import com.drafens.dranacg.ui.fragment.FragmentBookShelf;
 import com.drafens.dranacg.ui.fragment.FragmentBookSource;
 import com.drafens.dranacg.ui.fragment.FragmentDownload;
 import com.drafens.dranacg.R;
+import com.drafens.dranacg.ui.fragment.FragmentLogin;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener, FragmentBookSource.CallBackValue {
     private Toolbar toolbar;
-    private Fragment fragment=new FragmentBookShelf();
-    private int preNavId = R.id.nav_book_shelf;
+    private Fragment fragmentBookShelf, fragmentBookSource, fragmentDownLoad, fragmentLogin, fragmentAbout;
+    private Fragment currentFragment;
     private String siteItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fragmentBookShelf = new FragmentBookShelf();
+        fragmentBookSource = new FragmentBookSource();
+        fragmentDownLoad = new FragmentDownload();
+        fragmentLogin = new FragmentLogin();
+        fragmentAbout = new FragmentAbout();
         initView();
         ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},0);
     }
@@ -47,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragment_main,fragment);
+        currentFragment = fragmentBookShelf;
+        fragmentTransaction.add(R.id.fragment_main,currentFragment);
         fragmentTransaction.commit();
     }
 
@@ -67,24 +74,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_book_source) {
-            fragment = new FragmentBookSource();
+            showFragment(fragmentBookSource);
         } else if (id == R.id.nav_book_shelf) {
-            fragment = new FragmentBookShelf();
-        } else if (id == R.id.nav_download) {
-            fragment = new FragmentDownload();
+            showFragment(fragmentBookShelf);
+        }else if (id == R.id.nav_download) {
+            showFragment(fragmentDownLoad);
+        } else if (id == R.id.nav_login) {
+            showFragment(fragmentLogin);
         } else if (id == R.id.nav_about) {
-            fragment = new FragmentAbout();
+            showFragment(fragmentAbout);
         }
-        if (preNavId != id) {
-            preNavId = id;
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_main, fragment);
-            fragmentTransaction.commit();
-            toolbar.setTitle(item.getTitleCondensed());
-        }
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+        toolbar.setTitle(item.getTitleCondensed());
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    void showFragment(Fragment fragment){
+        if (currentFragment != fragment){
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.hide(currentFragment);
+            if (!fragment.isAdded()) {
+                fragmentTransaction.add(R.id.fragment_main, fragment).show(fragment);
+            } else {
+                fragmentTransaction.show(fragment);
+            }
+            fragmentTransaction.commit();
+            currentFragment = fragment;
+        }
     }
 
     @Override

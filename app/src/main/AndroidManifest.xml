@@ -32,11 +32,13 @@
             android:label="@string/search" />
         <activity
             android:name=".ui.activity.EpisodeActivity"
-            android:theme="@style/AppTheme.TransparentStatus"/>
-        <activity android:name=".ui.activity.ComicImageHorizon"
-            android:theme="@style/AppTheme.TransparentStatus"/>
-        <activity android:name=".ui.activity.ComicImageVertical"
-            android:theme="@style/AppTheme.TransparentStatus"/>
+            android:theme="@style/AppTheme.TransparentStatus" />
+        <activity
+            android:name=".ui.activity.ComicImageHorizon"
+            android:theme="@style/AppTheme.TransparentStatus" />
+        <activity
+            android:name=".ui.activity.ComicImageVertical"
+            android:theme="@style/AppTheme.TransparentStatus" />
     </application>
 
 </manifest>

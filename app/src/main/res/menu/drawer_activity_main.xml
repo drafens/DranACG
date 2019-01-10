@@ -21,6 +21,10 @@
     <item android:title="@string/others">
         <menu>
             <item
+                android:id="@+id/nav_login"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/login"/>
+            <item
                 android:id="@+id/nav_about"
                 android:icon="@mipmap/ic_launcher"
                 android:title="@string/about"/>
