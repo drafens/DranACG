@@ -127,6 +127,7 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                                     recyclerView.scrollToPosition(recentEpisodePosition);
                                 } else {
                                     textNonEpisode.setVisibility(View.VISIBLE);
+                                    episodeList.add(new Episode("",""));
                                 }
                             }
                         });
@@ -184,7 +185,7 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                             .setAction("Action", null).show();
                     fabFavourite.setImageDrawable(getDrawable(R.drawable.ic_favorite_border_white_24dp));
                     try {
-                        FavouriteManager.delete_favourite(isFavourite,Book.COMIC);
+                        FavouriteManager.delete_favourite(EpisodeActivity.this,isFavourite,Book.COMIC);
                     } catch (MyFileWriteException e) {
                         MyError.show(EpisodeActivity.this,MyError.MyFileWriteException);
                     } catch (MyJsonFormatException e){
@@ -196,15 +197,16 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                             .setAction("Action", null).show();
                     fabFavourite.setImageDrawable(getDrawable(R.drawable.ic_favorite_white_24dp));
                     try {
-                        book.setLastReadChapter(episodeList.get(recentEpisodePosition).getName());
-                        book.setLastReadChapter_id(episodeList.get(recentEpisodePosition).getId());
+                        if (episodeList.size()>0) {
+                            book.setLastReadChapter(episodeList.get(recentEpisodePosition).getName());
+                            book.setLastReadChapter_id(episodeList.get(recentEpisodePosition).getId());
+                        }
                         book.setLastReadTime(Tools.getCurrentTime());
-                        FavouriteManager.add_favourite(book,Book.COMIC);
+                        FavouriteManager.add_favourite(EpisodeActivity.this,book,Book.COMIC);
                         isFavourite = FavouriteManager.isFavourite(book.getWebsite(),book.getId(),Book.COMIC);
-                    } catch (MyFileWriteException e) {
+                    } catch (Exception e) {
                         MyError.show(EpisodeActivity.this,MyError.MyFileWriteException);
-                    } catch (MyJsonFormatException e){
-                        MyError.show(EpisodeActivity.this,MyError.MyJsonFormatException);
+                        e.printStackTrace();
                     }
                 }
                 break;
@@ -221,7 +223,6 @@ public class EpisodeActivity extends AppCompatActivity implements View.OnClickLi
                         intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
                     }
                 }
-                //Intent intent = new Intent(EpisodeActivity.this, ComicImageHorizon.class);
                 intent.putExtra("episode",(Serializable) episodeList);
                 intent.putExtra("book",book);
                 intent.putExtra("episode_position", recentEpisodePosition);

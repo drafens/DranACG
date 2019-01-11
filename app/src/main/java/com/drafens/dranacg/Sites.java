@@ -9,10 +9,11 @@ import com.drafens.dranacg.comic.Pufei;
 import java.util.List;
 
 public abstract class Sites {
-    public static final String CHUIXUE = "m.chuixue.net";
-    private static final String KIRIKIRI = "www.kirikiri.tv";
-    public static final String PUFEI = "www.pufei.net";
-    public static final String GUFENG = "m.gufengmh.com";
+    public static final String CHUIXUE = "chuixue";
+    private static final String KIRIKIRI = "kirikiri";
+    public static final String PUFEI = "pufei";
+    public static final String GUFENG = "gufengmh";
+
     public static final String ANIMATION_GROUP[] = {Sites.KIRIKIRI};
     public static final String COMIC_GROUP[] = {Sites.GUFENG,Sites.CHUIXUE,Sites.PUFEI};
 
@@ -80,6 +81,7 @@ public abstract class Sites {
             case GUFENG:
                 return new Gufeng();
             case KIRIKIRI:
+                return null;
         }
         return null;
     }

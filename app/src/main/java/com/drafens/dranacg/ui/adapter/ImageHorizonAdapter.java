@@ -44,7 +44,7 @@ public class ImageHorizonAdapter extends PagerAdapter {
         View view = LayoutInflater.from(context).inflate(R.layout.item_image_horizon, container, false);
         view.setTag(position);
         ImageView imageView = view.findViewById(R.id.iv_comic);
-        ImageManager.getImage(imageList.get(position), imageView);
+        ImageManager.getImage(context, imageList.get(position), imageView);
         container.addView(view);
         return view;
     }

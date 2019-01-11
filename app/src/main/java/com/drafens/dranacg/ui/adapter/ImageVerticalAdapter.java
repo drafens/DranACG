@@ -32,7 +32,7 @@ public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdap
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        ImageManager.getImage(imageUrlList.get(position), holder.image);
+        ImageManager.getImage(context, imageUrlList.get(position), holder.image);
     }
 
     @Override

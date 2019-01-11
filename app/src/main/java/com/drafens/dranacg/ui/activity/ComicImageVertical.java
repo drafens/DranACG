@@ -80,7 +80,7 @@ public class ComicImageVertical extends AppCompatActivity{
             book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
             book.setLastReadTime(Tools.getCurrentTime());
             try {
-                FavouriteManager.update_favourite(book,Book.COMIC);
+                FavouriteManager.update_favourite(true,ComicImageVertical.this,book,Book.COMIC);
             } catch (MyFileWriteException e) {
                 MyError.show(ComicImageVertical.this,MyError.MyFileWriteException);
             }

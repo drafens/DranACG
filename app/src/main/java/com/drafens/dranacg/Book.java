@@ -26,6 +26,7 @@ public class Book implements Serializable {
     private String lastReadTime="";
     private String readPosition="";
     private int readMode=0;
+    private boolean isSync=false;
 
     public Book(String website, String id){
         this.website = website;
@@ -77,6 +78,9 @@ public class Book implements Serializable {
     public int getReadMode() {
         return readMode;
     }
+    public boolean getIsSync(){
+        return isSync;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -118,6 +122,10 @@ public class Book implements Serializable {
         this.readPosition = readPosition;
     }
 
+    public void setIsSync(boolean isSync) {
+        this.isSync = isSync;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -136,6 +144,7 @@ public class Book implements Serializable {
         string += "\r\nlastReadTime:"+lastReadTime;
         string += "\r\nreadPosition"+readPosition;
         string += "\r\nreadMode:"+readMode;
+        string += "\r\nisSync:"+isSync;
         return string;
     }
 }

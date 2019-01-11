@@ -2,6 +2,7 @@ package com.drafens.dranacg.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,15 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.drafens.dranacg.R;
+import com.drafens.dranacg.tools.FavouriteManager;
+import com.drafens.dranacg.tools.FileManager;
 import com.drafens.dranacg.tools.Webdav;
 
+import java.util.Objects;
+
 public class FragmentLogin extends Fragment implements View.OnClickListener {
-    private EditText editUsername;
-    private EditText editPassword;
+    private TextInputEditText editUsername;
+    private TextInputEditText editPassword;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,13 +34,15 @@ public class FragmentLogin extends Fragment implements View.OnClickListener {
         editUsername = view.findViewById(R.id.et_username);
         editPassword = view.findViewById(R.id.et_password);
         Button buttonLogin = view.findViewById(R.id.btn_login);
+        Button buttonSync = view.findViewById(R.id.btn_sync);
         buttonLogin.setOnClickListener(this);
+        buttonSync.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        String username = editUsername.getText().toString();
-        String password = editPassword.getText().toString();
+        final String username = Objects.requireNonNull(editUsername.getText()).toString();
+        final String password = Objects.requireNonNull(editPassword.getText()).toString();
         switch (v.getId()){
             case R.id.btn_login:
                 if (TextUtils.isEmpty(username)){
@@ -48,14 +54,28 @@ public class FragmentLogin extends Fragment implements View.OnClickListener {
                         @Override
                         public void connectedSucceed() {
                             Toast.makeText(getActivity(),"登陆成功",Toast.LENGTH_SHORT).show();
+                            FileManager.putPreferences("isLogin", true, Objects.requireNonNull(getContext()));
+                            FileManager.putPreferences("username", username, Objects.requireNonNull(getContext()));
+                            FileManager.putPreferences("password", password, Objects.requireNonNull(getContext()));
+                            FavouriteManager.syncFavourite(getContext());
                         }
 
                         @Override
                         public void connectedFailed(int failedCode) {
-                            Toast.makeText(getActivity(),"登陆失败",Toast.LENGTH_SHORT).show();
+                            if (failedCode == 401){
+                                Toast.makeText(getActivity(),"账号密码错误",Toast.LENGTH_SHORT).show();
+                                FileManager.putPreferences("isLogin", false, Objects.requireNonNull(getContext()));
+                            }else {
+                                Toast.makeText(getActivity(), "登陆失败", Toast.LENGTH_SHORT).show();
+                                FileManager.putPreferences("isLogin", false, Objects.requireNonNull(getContext()));
+                                Log.d("TAG", "connectedFailed: " + failedCode);
+                            }
                         }
                     });
                 }
+                break;
+            case R.id.btn_sync:
+                FavouriteManager.syncFavourite(getContext());
                 break;
         }
     }

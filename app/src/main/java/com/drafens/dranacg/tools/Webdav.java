@@ -3,12 +3,14 @@ package com.drafens.dranacg.tools;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 
+import com.drafens.dranacg.Book;
 import com.drafens.dranacg.error.MyFileWriteException;
+import com.drafens.dranacg.error.MyJsonFormatException;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -18,26 +20,30 @@ import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.DavMethod;
+import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.client.methods.PutMethod;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
+import java.util.List;
 
 public class Webdav {
-    private static String davUrl = "https://dav.jianguoyun.com/dav/DranACG";
-    private static String fileName = "/favourite_comic.json";
+    private static String davUrl = "https://dav.jianguoyun.com";
+    private static String FavCatalog = "/dav/DranACG/favourite_comic";
+    private static String DavCatalog = "/dav";
 
-    public static void isConnected(final Context context, final String userName, final String passWord,final IsConnectedCallback callback){
+    public static void isConnected(final Context context, final String username, final String password, final IsConnectedCallback callback){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     HttpClient client = new HttpClient();
-                    Credentials creds = new UsernamePasswordCredentials(userName, passWord);
+                    Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
-                    final DavMethod mkCol = new MkColMethod(davUrl);
+                    final DavMethod mkCol = new MkColMethod(davUrl + DavCatalog);
                     client.executeMethod(mkCol);
                     if (mkCol.getStatusCode() == 201) {
                         ((Activity) context).runOnUiThread(new Runnable() {
@@ -73,19 +79,21 @@ public class Webdav {
         void connectedFailed(int failedCode);
     }
 
-    static void putFile(final File file, final String userName, final String passWord){
+    static void putFile(final Context context, final JSONObject object){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     HttpClient client = new HttpClient();
-                    Credentials creds = new UsernamePasswordCredentials(userName, passWord);
+                    String username = FileManager.getPreferenceStr("username", context);
+                    String password = FileManager.getPreferenceStr("password", context);
+                    Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
-                    DavMethod mkCol = new MkColMethod(davUrl);
+                    DavMethod mkCol = new MkColMethod(davUrl + FavCatalog);
                     client.executeMethod(mkCol);
                     if (mkCol.getStatusCode() == 201) {
-                        PutMethod put = new PutMethod(davUrl + fileName);
-                        RequestEntity requestEntity = new InputStreamRequestEntity(new FileInputStream(file));
+                        PutMethod put = new PutMethod(davUrl + FavCatalog + getFileName(object));
+                        RequestEntity requestEntity = new InputStreamRequestEntity(new ByteArrayInputStream(object.toString().getBytes("UTF-8")));
                         put.setRequestEntity(requestEntity);
                         client.executeMethod(put);
                     }else {
@@ -98,18 +106,45 @@ public class Webdav {
         }).start();
     }
 
-    private void getFile(final String userName, final String passWord){
+    static void delFile(final Context context, final String fileName){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     HttpClient client = new HttpClient();
-                    Credentials creds = new UsernamePasswordCredentials(userName, passWord);
+                    String username = FileManager.getPreferenceStr("username", context);
+                    String password = FileManager.getPreferenceStr("password", context);
+                    Credentials creds = new UsernamePasswordCredentials(username, password);
+                    client.getState().setCredentials(AuthScope.ANY, creds);
+                    DavMethod mkCol = new MkColMethod(davUrl + FavCatalog);
+                    client.executeMethod(mkCol);
+                    if (mkCol.getStatusCode() == 201) {
+                        DeleteMethod delete = new DeleteMethod(davUrl + FavCatalog + fileName);
+                        client.executeMethod(delete);
+                    }else {
+                        throw new MyFileWriteException();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void getFile(final Context context, final String fileName){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpClient client = new HttpClient();
+                    String username = FileManager.getPreferenceStr("username", context);
+                    String password = FileManager.getPreferenceStr("password", context);
+                    Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
                     DavMethod mkCol = new MkColMethod(davUrl);
                     client.executeMethod(mkCol);
                     if (mkCol.getStatusCode() == 201) {
-                        GetMethod get = new GetMethod(davUrl);
+                        GetMethod get = new GetMethod(davUrl + fileName);
                         client.executeMethod(get);
                         byte[] bytes = get.getResponseBody();
                         String string = new String(bytes);
@@ -124,23 +159,41 @@ public class Webdav {
         }).start();
     }
 
-    private void findFile(final String userName, final String passWord){
+    static void syncFile(final Context context, final List<Book> bookList){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     HttpClient client = new HttpClient();
-                    Credentials creds = new UsernamePasswordCredentials(userName, passWord);
+                    String username = FileManager.getPreferenceStr("username", context);
+                    String password = FileManager.getPreferenceStr("password", context);
+                    Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
-                    DavMethod mkCol = new MkColMethod(davUrl);
+                    DavMethod mkCol = new MkColMethod(davUrl + FavCatalog);
                     client.executeMethod(mkCol);
                     if (mkCol.getStatusCode() == 201) {
-                        DavMethod find = new PropFindMethod(davUrl, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
+                        DavMethod find = new PropFindMethod(davUrl + FavCatalog, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
                         client.executeMethod(find);
                         MultiStatus multiStatus = find.getResponseBodyAsMultiStatus();
                         MultiStatusResponse[] responses = multiStatus.getResponses();
-                        for (MultiStatusResponse response : responses) {
-                            Log.d("TAG", response.getHref());
+                        for (int i=1;i<responses.length;i++) {
+                            GetMethod get = new GetMethod(davUrl + responses[i].getHref());
+                            client.executeMethod(get);
+                            byte[] bytes = get.getResponseBody();
+                            String string = new String(bytes);
+                            Book book = JsonManger.jsonToBook(new JSONObject(string));
+                            string = responses[i].getHref().substring(responses[i].getHref().lastIndexOf("/")+1).replaceAll("_","/");
+                            Log.d("TAG", string);
+                            String[] strings = string.split("\\.");
+                            int isFavourite = FavouriteManager.isFavourite(strings[0],strings[1],Book.COMIC);
+                            if(isFavourite == -1){
+                                FavouriteManager.add_favourite(context,book,Book.COMIC);
+                            }else{
+                                Log.d("TAG", Tools.strToInt(book.getLastReadTime()) +"*"+ Tools.strToInt(bookList.get(isFavourite).getLastReadTime()));
+                                if (Tools.strToInt(book.getLastReadTime()) > Tools.strToInt(bookList.get(isFavourite).getLastReadTime())){
+                                    FavouriteManager.update_favourite(false,context,book,Book.COMIC);
+                                }
+                            }
                         }
                     }else {
                         throw new MyFileWriteException();
@@ -150,5 +203,14 @@ public class Webdav {
                 }
             }
         }).start();
+    }
+
+    static String getFileName(JSONObject object) throws MyJsonFormatException {
+        try {
+            return "/" + (object.getString("webSite") + "." + object.getString("id")).replaceAll("/","_");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new MyJsonFormatException();
+        }
     }
 }

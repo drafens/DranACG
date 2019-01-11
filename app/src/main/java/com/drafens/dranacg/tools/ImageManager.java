@@ -1,27 +1,29 @@
 package com.drafens.dranacg.tools;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
 
 public class ImageManager {
-    public static void getIcon(String url, ImageView imageView){
+    public static void getIcon(Context context, String url, ImageView imageView){
         if (!url.isEmpty()) {
-            Picasso.get().load(url).into(imageView);
+            Glide.with(context).load(url).into(imageView);
         }
     }
 
-    public static void getImage(String url, ImageView imageView){
+    public static void getImage(Context context, String url, ImageView imageView){
         if (!url.isEmpty()) {
-            Picasso.get().load(url).into(imageView);
+            Glide.with(context).load(url).into(imageView);
         }
     }
 
@@ -29,20 +31,19 @@ public class ImageManager {
     }
 
     public static void setBackground(final Context context, String url, final View view) {
-        Picasso.get().load(url).into(new Target() {
+        Glide.with(context).load(url).into(new CustomViewTarget<View,Drawable>(view) {
             @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Drawable drawable = new BitmapDrawable(context.getResources(),bitmap);
-                view.setBackground(drawable);
-            }
-
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
 
             }
 
             @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                view.setBackground(resource);
+            }
+
+            @Override
+            protected void onResourceCleared(@Nullable Drawable placeholder) {
 
             }
         });

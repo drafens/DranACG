@@ -77,7 +77,7 @@ public class ComicImageHorizon extends AppCompatActivity implements ViewPager.On
             book.setLastReadChapter_id(episodeList.get(episodePosition).getId());
             book.setLastReadTime(Tools.getCurrentTime());
             try {
-                FavouriteManager.update_favourite(book,Book.COMIC);
+                FavouriteManager.update_favourite(true,ComicImageHorizon.this,book,Book.COMIC);
             } catch (MyFileWriteException e) {
                 MyError.show(ComicImageHorizon.this,MyError.MyFileWriteException);
             }

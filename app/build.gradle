@@ -27,18 +27,8 @@ android {
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.google.com' }
-}
-
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def requested = details.requested
-        if (requested.group == 'com.android.support') {
-            if (!requested.name.startsWith("multidex")) {
-                details.useVersion '27.1.0'
-            }
-        }
-    }
+    google()
+    //maven { url 'https://maven.google.com' }
 }
 
 dependencies {
@@ -51,12 +41,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    //Jsoup
+    //Jsoup不同
     implementation 'org.jsoup:jsoup:1.11.2'
     //okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    //picasso
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     //JavaScript
     implementation 'io.apisense:rhino-android:1.0'
     //log

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,6 @@ public class FragmentBookShelf extends Fragment {
     private int updateSize;
 
     private boolean isFirstRun = true;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_shelf, container,false);
@@ -54,6 +54,15 @@ public class FragmentBookShelf extends Fragment {
             adapter.updateData(updateSize, bookList);
         }else {
             isFirstRun = false;
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            getUpdateList();
+            adapter.updateData(updateSize, bookList);
         }
     }
 
@@ -82,7 +91,7 @@ public class FragmentBookShelf extends Fragment {
                         if (sites != null) {
                             book = sites.getBook(book);
                         }
-                        FavouriteManager.update_favourite(book, Book.COMIC);
+                        FavouriteManager.update_favourite(false,getContext(), book, Book.COMIC);
                     } catch (MyJsoupResolveException e) {
                         e.printStackTrace();
                         Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
