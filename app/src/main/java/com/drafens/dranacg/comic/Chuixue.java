@@ -1,6 +1,5 @@
 package com.drafens.dranacg.comic;
 
-import android.util.Base64;
 import android.util.Log;
 
 import com.drafens.dranacg.Book;
@@ -144,7 +143,6 @@ public class Chuixue extends Sites {
             e.printStackTrace();
             throw new MyNetworkException();
         }
-        com.orhanobut.logger.Logger.d(urlList);
         return urlList;
     }
 }

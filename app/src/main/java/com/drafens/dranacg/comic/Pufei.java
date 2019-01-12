@@ -6,11 +6,9 @@ import android.util.Log;
 import com.drafens.dranacg.Book;
 import com.drafens.dranacg.Episode;
 import com.drafens.dranacg.Sites;
-import com.drafens.dranacg.error.MyJsonFormatException;
 import com.drafens.dranacg.error.MyJsoupResolveException;
 import com.drafens.dranacg.error.MyNetworkException;
 import com.drafens.dranacg.tools.MyDescription;
-import com.orhanobut.logger.Logger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

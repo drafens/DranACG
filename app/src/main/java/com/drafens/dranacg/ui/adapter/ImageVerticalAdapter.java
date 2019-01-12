@@ -1,8 +1,8 @@
 package com.drafens.dranacg.ui.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +11,9 @@ import android.widget.ImageView;
 import com.drafens.dranacg.tools.ImageManager;
 import com.drafens.dranacg.R;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdapter.ViewHolder> {
     private Context context;
@@ -50,9 +51,12 @@ public class ImageVerticalAdapter extends RecyclerView.Adapter<ImageVerticalAdap
 
     public void setImageUrlList(List<String> newList,boolean isNext) {
         if (isNext) {
+            int location = this.imageUrlList.size();
             this.imageUrlList.addAll(newList);
+            notifyItemRangeInserted(location, location + newList.size());
         }else {
             this.imageUrlList.addAll(0,newList);
+            notifyItemRangeInserted(0, newList.size());
         }
     }
 }

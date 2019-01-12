@@ -1,10 +1,8 @@
 package com.drafens.dranacg.tools;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.drafens.dranacg.error.MyJsoupResolveException;
-import com.orhanobut.logger.Logger;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;

@@ -12,6 +12,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class FileManager {
+    public static final String IS_LOGIN = "isLogin";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/drafens/";
 
     public static void putPreferences(String name, String data, Context context){
@@ -35,7 +39,7 @@ public class FileManager {
         editor.apply();
     }
 
-    static String getPreferenceStr(String name, Context context){
+    public static String getPreferenceStr(String name, Context context){
         SharedPreferences preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
         return preferences.getString(name, "");
     }

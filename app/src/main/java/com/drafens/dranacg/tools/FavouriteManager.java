@@ -37,7 +37,7 @@ public class FavouriteManager {
             throw new MyJsonFormatException();
         }
         FileManager.writeFiles("favourite_"+getJasonSearchItem(searchItem)+".json",jsonObject.toString());
-        Webdav.putFile(context, JsonManger.getSimpleJson(book));
+        WebdavManager.putFile(context, JsonManger.getSimpleJson(book));
     }
 
     public static void delete_favourite(Context context, int i, int searchItem) throws MyFileWriteException, MyJsonFormatException {
@@ -48,7 +48,7 @@ public class FavouriteManager {
             String string = FileManager.readFiles("files/favourite_"+getJasonSearchItem(searchItem)+".json");
             jsonObject = new JSONObject(string);
             jsonArray = jsonObject.getJSONArray("book");
-            fileName = Webdav.getFileName(jsonArray.getJSONObject(i));
+            fileName = WebdavManager.getFileName(jsonArray.getJSONObject(i));
             jsonArray.remove(i);
         }catch (Exception e){
             jsonObject = new JSONObject();
@@ -63,7 +63,7 @@ public class FavouriteManager {
         }
         FileManager.writeFiles("favourite_"+getJasonSearchItem(searchItem)+".json",jsonObject.toString());
         if (!fileName.isEmpty()) {
-            Webdav.delFile(context, fileName);
+            WebdavManager.delFile(context, fileName);
         }
     }
 
@@ -119,7 +119,7 @@ public class FavouriteManager {
                 jsonObject.put("size", jsonArray.length());
                 FileManager.writeFiles("favourite_" + getJasonSearchItem(searchItem) + ".json", jsonObject.toString());
                 if (syncPermit) {
-                    Webdav.putFile(context, JsonManger.getSimpleJson(book));
+                    WebdavManager.putFile(context, JsonManger.getSimpleJson(book));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -135,7 +135,7 @@ public class FavouriteManager {
         } catch (Exception e) {
             bookList = new ArrayList<>();
         }
-        Webdav.syncFile(context,bookList);
+        WebdavManager.syncFile(context,bookList);
     }
 
     public static List<Book> getBookList(int searchItem) throws MyJsonEmptyException, MyJsonFormatException {

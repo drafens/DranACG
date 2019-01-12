@@ -30,7 +30,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-public class Webdav {
+public class WebdavManager {
     private static String davUrl = "https://dav.jianguoyun.com";
     private static String FavCatalog = "/dav/DranACG/favourite_comic";
     private static String DavCatalog = "/dav/DranACG";
@@ -40,7 +40,7 @@ public class Webdav {
             @Override
             public void run() {
                 try {
-                    HttpClient client = new HttpClient();
+                    final HttpClient client = new HttpClient();
                     Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
                     Log.d("TAG", davUrl + DavCatalog);
@@ -50,7 +50,7 @@ public class Webdav {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                callback.connectedSucceed();
+                                callback.connectedSucceed(client);
                             }
                         });
                     }else {
@@ -76,7 +76,7 @@ public class Webdav {
 
 
     public interface IsConnectedCallback {
-        void connectedSucceed();
+        void connectedSucceed(HttpClient client);
         void connectedFailed(int failedCode);
     }
 
@@ -177,7 +177,7 @@ public class Webdav {
                         client.executeMethod(find);
                         MultiStatus multiStatus = find.getResponseBodyAsMultiStatus();
                         MultiStatusResponse[] responses = multiStatus.getResponses();
-                        Log.d("TAG", responses[0].getHref());
+                        Log.d("TAG", responses[1].toString());
                         for (int i=1;i<responses.length;i++) {
                             GetMethod get = new GetMethod(davUrl + responses[i].getHref());
                             client.executeMethod(get);
