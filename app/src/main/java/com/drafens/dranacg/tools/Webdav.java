@@ -33,7 +33,7 @@ import java.util.List;
 public class Webdav {
     private static String davUrl = "https://dav.jianguoyun.com";
     private static String FavCatalog = "/dav/DranACG/favourite_comic";
-    private static String DavCatalog = "/dav";
+    private static String DavCatalog = "/dav/DranACG";
 
     public static void isConnected(final Context context, final String username, final String password, final IsConnectedCallback callback){
         new Thread(new Runnable() {
@@ -43,6 +43,7 @@ public class Webdav {
                     HttpClient client = new HttpClient();
                     Credentials creds = new UsernamePasswordCredentials(username, password);
                     client.getState().setCredentials(AuthScope.ANY, creds);
+                    Log.d("TAG", davUrl + DavCatalog);
                     final DavMethod mkCol = new MkColMethod(davUrl + DavCatalog);
                     client.executeMethod(mkCol);
                     if (mkCol.getStatusCode() == 201) {
@@ -176,6 +177,7 @@ public class Webdav {
                         client.executeMethod(find);
                         MultiStatus multiStatus = find.getResponseBodyAsMultiStatus();
                         MultiStatusResponse[] responses = multiStatus.getResponses();
+                        Log.d("TAG", responses[0].getHref());
                         for (int i=1;i<responses.length;i++) {
                             GetMethod get = new GetMethod(davUrl + responses[i].getHref());
                             client.executeMethod(get);
@@ -183,13 +185,11 @@ public class Webdav {
                             String string = new String(bytes);
                             Book book = JsonManger.jsonToBook(new JSONObject(string));
                             string = responses[i].getHref().substring(responses[i].getHref().lastIndexOf("/")+1).replaceAll("_","/");
-                            Log.d("TAG", string);
                             String[] strings = string.split("\\.");
                             int isFavourite = FavouriteManager.isFavourite(strings[0],strings[1],Book.COMIC);
                             if(isFavourite == -1){
                                 FavouriteManager.add_favourite(context,book,Book.COMIC);
                             }else{
-                                Log.d("TAG", Tools.strToInt(book.getLastReadTime()) +"*"+ Tools.strToInt(bookList.get(isFavourite).getLastReadTime()));
                                 if (Tools.strToInt(book.getLastReadTime()) > Tools.strToInt(bookList.get(isFavourite).getLastReadTime())){
                                     FavouriteManager.update_favourite(false,context,book,Book.COMIC);
                                 }
